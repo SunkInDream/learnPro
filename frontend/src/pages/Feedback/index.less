@@ -1,0 +1,116 @@
+.feedback-layout {
+  min-height: 100vh;
+
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+
+    .logo {
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      margin-right: 48px;
+    }
+
+    .ant-menu {
+      flex: 1;
+      background: transparent;
+    }
+  }
+
+  .content {
+    padding: 24px;
+
+    .intro-card {
+      .team-intro {
+        h3 {
+          color: #1890ff;
+          margin: 24px 0 16px 0;
+          font-size: 18px;
+          
+          &:first-child {
+            margin-top: 0;
+          }
+        }
+
+        p {
+          color: #666;
+          line-height: 1.8;
+          margin-bottom: 16px;
+        }
+
+        ul {
+          color: #666;
+          line-height: 1.8;
+          padding-left: 20px;
+          
+          li {
+            margin-bottom: 12px;
+            
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+
+    .feedback-card {
+      .feedback-input {
+        position: relative;
+        margin-bottom: 16px;
+
+        .ant-input {
+          margin-bottom: 40px;
+        }
+
+        .submit-btn {
+          position: absolute;
+          bottom: 0;
+          right: 0;
+        }
+      }
+    }
+
+    .about-card {
+      .contact-info {
+        h3 {
+          color: #1890ff;
+          margin-bottom: 16px;
+        }
+
+        p {
+          margin-bottom: 8px;
+          color: #666;
+        }
+      }
+
+      .qr-code {
+        text-align: center;
+        
+        h3 {
+          color: #1890ff;
+          margin-bottom: 16px;
+        }
+      }
+
+      .team-members {
+        h3 {
+          color: #1890ff;
+          margin-bottom: 16px;
+        }
+
+        .member-name {
+          font-weight: 500;
+          margin-bottom: 4px;
+        }
+
+        .member-role {
+          color: #666;
+          font-size: 12px;
+        }
+      }
+    }
+  }
+} 
