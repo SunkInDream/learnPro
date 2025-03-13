@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Layout, Menu, Button, Card, Input, Upload, Space, message, TimePicker, Form } from 'antd';
 import { UploadOutlined, SendOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -10,16 +10,53 @@ const { TextArea } = Input;
 
 const Home = () => {
   const [question, setQuestion] = useState('');
+  const [chatHistory, setChatHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const chatContainerRef = useRef(null);
 
-  const handleSendQuestion = () => {
+  // 聊天记录滚动到底部
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatHistory]);
+
+  const handleSendQuestion = async () => {
     if (!question.trim()) {
       message.warning('请输入问题');
       return;
     }
-    // TODO: 发送问题到后端
-    console.log('发送问题:', question);
+    
+    // 添加用户问题到聊天记录
+    setChatHistory(prev => [...prev, { role: 'user', content: question }]);
+    
+    setLoading(true);
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ question: question })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        // 添加AI回答到聊天记录
+        setChatHistory(prev => [...prev, { role: 'assistant', content: data.answer }]);
+      } else {
+        message.error(data.error || '请求失败');
+      }
+    } catch (error) {
+      console.error('请求错误:', error);
+      message.error('网络错误，请稍后再试');
+    } finally {
+      setLoading(false);
+      setQuestion(''); // 清空输入框
+    }
   };
 
   const handleGeneratePlan = async () => {
@@ -53,8 +90,19 @@ const Home = () => {
 
       <Content className="content">
         <Card title="AI 问答助手" className="qa-card">
-          <div className="chat-container">
-            {/* 这里可以添加聊天记录展示 */}
+          <div className="chat-container" ref={chatContainerRef}>
+            {chatHistory.length > 0 ? (
+              chatHistory.map((msg, index) => (
+                <div key={index} className={`chat-message ${msg.role}`}>
+                  <div className="message-content">
+                    {msg.role === 'user' ? '我: ' : 'AI: '}
+                    {msg.content}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-chat">发送问题开始与AI对话</div>
+            )}
           </div>
           <div className="input-area">
             <TextArea
@@ -62,6 +110,13 @@ const Home = () => {
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="请输入您的问题..."
               autoSize={{ minRows: 2, maxRows: 6 }}
+              onPressEnter={(e) => {
+                if (!e.shiftKey) {
+                  e.preventDefault();
+                  handleSendQuestion();
+                }
+              }}
+              disabled={loading}
             />
             <Space className="action-buttons">
               <Upload>
@@ -71,6 +126,7 @@ const Home = () => {
                 type="primary" 
                 icon={<SendOutlined />}
                 onClick={handleSendQuestion}
+                loading={loading}
               >
                 发送
               </Button>
@@ -109,4 +165,4 @@ const Home = () => {
   );
 };
 
-export default Home; 
+export default Home;
