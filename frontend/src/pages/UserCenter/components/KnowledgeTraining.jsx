@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Progress, List, Tag, Button, Modal, Form, Input, DatePicker, InputNumber, message } from 'antd';
+import { Card, Progress, List, Tag, Button, Modal, Form, Input, DatePicker, InputNumber, message, Select } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
@@ -272,9 +272,12 @@ const KnowledgeTraining = () => {
           <Form.Item
             label="知识点名称"
             name="topic"
-            rules={[{ required: true, message: '请输入知识点名称' }]}
+            rules={[{ required: true, message: '请选择知识点名称' }]}
           >
-            <Input placeholder="请输入知识点名称" />
+            <Select placeholder="请选择知识点">
+              <Select.Option value="导数">导数</Select.Option>
+              <Select.Option value="积分">积分</Select.Option>
+            </Select>
           </Form.Item>
           
           <Form.Item
@@ -307,4 +310,4 @@ const KnowledgeTraining = () => {
   );
 };
 
-export default KnowledgeTraining; 
+export default KnowledgeTraining;

@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-
+from datetime import datetime
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///instance.sqlite"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -17,6 +17,8 @@ class User(db.Model):
     birthday = db.Column(db.String(120))
     targetSchool = db.Column(db.String(120))
     bio = db.Column(db.String(1200))
+    knowledge_progresses = db.relationship('UserKnowledgeProgress', backref='user', lazy=True)
+    exercise_records = db.relationship('ExerciseRecord', backref='user', lazy=True)
     def __init__(self, username, password, email, phone, nickname=None,grade=None,birthday=None,targetSchool=None,bio=None):
         self.username = username
         self.password = password
@@ -38,6 +40,30 @@ class User(db.Model):
         if user is None:
             return False
         return user.password == password
+    
+    from datetime import datetime
+
+class KnowledgePoint(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    subject = db.Column(db.String(100), nullable=False)  
+
+class ExerciseRecord(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    knowledge_point_id = db.Column(db.Integer, db.ForeignKey('knowledge_point.id'), nullable=False)
+    difficulty = db.Column(db.Integer) 
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class UserKnowledgeProgress(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    knowledge_point_id = db.Column(db.Integer, db.ForeignKey('knowledge_point.id'), nullable=False)
+    mastery_level = db.Column(db.Float, default=0.0)  # 掌握程度 0-100
+    last_practiced = db.Column(db.DateTime)
+    
+    # 确保用户和知识点组合的唯一性
+    __table_args__ = (db.UniqueConstraint('user_id', 'knowledge_point_id'),)
 
 with app.app_context():
     db.create_all()
