@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Layout, Menu, Button, Card, Input, Upload, Space, message, TimePicker, Form } from 'antd';
-import { UploadOutlined, SendOutlined } from '@ant-design/icons';
+import { UploadOutlined, SendOutlined, DownloadOutlined, CalendarOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import './index.less';
@@ -76,6 +76,41 @@ const Home = () => {
     }
   };
 
+  const generateAndDownloadExam = async () => {
+    fetch('/api/generate_exam')
+        .then(response => response.blob())
+        .then(blob => {
+            // 创建一个下载链接
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'exam.docx';  // 设置下载文件的名称
+            link.click();
+        })
+        .catch(error => console.error('Error:', error));
+}
+  
+const handleDownload = () => {
+  fetch('/api/generate_markdown')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.blob();
+    })
+    .then(blob => {
+      // 创建一个下载链接
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'study_plan.md';  // 设置下载文件的名称
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    })
+    .catch(error => {
+      console.error('Error downloading file:', error);
+      message.error('下载文件失败，请稍后重试');
+    });
+};
   return (
     <Layout className="home-layout">
       <Header className="header">
@@ -138,7 +173,7 @@ const Home = () => {
           <Form
             form={form}
             initialValues={{
-              timeRange: [moment('07:00', 'HH:mm'), moment('21:00', 'HH:mm')]
+              timeRange: [moment('07:00', 'HH:mm'),   moment('21:00', 'HH:mm')]
             }}
           >
             <Form.Item
@@ -151,18 +186,34 @@ const Home = () => {
                 placeholder={['开始时间', '结束时间']}
               />
             </Form.Item>
-            <div className='bu'>
-              <Form.Item>
-                <Button type="primary" onClick={handleGeneratePlan}>
-                  生成学习计划
-                </Button>
-              </Form.Item>
+            <div className='button-container' style={{ 
+              margin: '20px 0',
+              display: 'flex',
+              justifyContent: 'flex-end' // 这会将按钮组右对齐
+            }}>
+              <Button 
+                type="primary"
+                icon={<CalendarOutlined />} 
+                onClick={handleGeneratePlan}
+                style={{ marginRight: '10px' }}
+              >
+                生成学习计划
+              </Button>
+              <Button 
+                type="primary" 
+                ghost
+                icon={<DownloadOutlined />}
+                onClick={() => generateAndDownloadExam()}
+              >
+                生成试题并下载
+              </Button>
             </div>
           </Form>
         </Card>
       </Content>
     </Layout>
   );
+  
 };
 
 export default Home;

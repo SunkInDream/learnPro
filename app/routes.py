@@ -1,8 +1,10 @@
-from flask import Flask,request, jsonify
 from flask_cors import CORS
 from app.models.database import db, User, app
 from flask_sqlalchemy import SQLAlchemy
 from app.models.LLM import main as llm_query
+from flask import Flask, jsonify, request, send_file, make_response
+from docx import Document
+import os
 CORS(app)
 
 
@@ -108,3 +110,50 @@ def chat():
         error_details = traceback.format_exc()
         print(f"聊天API错误: {str(e)}\n{error_details}")
         return {'error': f'处理请求时出错: {str(e)}'}, 500
+@app.route('/api/generate_exam', methods=['GET'])
+def generate_exam():
+    import io
+    
+    # 生成试题（模拟调用AI API生成试题）
+    questions = [
+        "1. 求下列函数的导数：f(x) = 2x^3 - 5x + 3",
+        "2. 求下列函数在x=1处的导数：f(x) = sin(x)",
+        "3. 求下列函数的导数并求出其极值：f(x) = x^4 - 4x^3 + 6x^2 - 3x + 2"
+    ]
+
+    # 创建 DOCX 文件
+    doc = Document()
+    doc.add_heading('导数试卷', 0)
+    doc.add_heading('一、选择题', level=1)
+    for question in questions:
+        doc.add_paragraph(question)
+
+    # 保存到内存流中，而不是文件
+    file_stream = io.BytesIO()
+    doc.save(file_stream)
+    file_stream.seek(0)
+
+    # 直接从内存中发送文件
+    return send_file(
+        file_stream,
+        mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        as_attachment=True,
+        download_name='导数试卷.docx'
+    )
+@app.route('/api/generate_markdown', methods=['GET'])
+def generate_markdown():
+    # 创建Markdown内容
+    markdown_content = """# 学习计划
+    
+## 今日任务
+- 复习高数第三章
+- 完成物理作业
+- 阅读英语文章
+    """
+    
+    # 创建响应
+    response = make_response(markdown_content)
+    response.headers["Content-Disposition"] = "attachment; filename=study_plan.md"
+    response.headers["Content-Type"] = "text/markdown"
+    
+    return response
