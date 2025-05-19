@@ -76,41 +76,6 @@ const Home = () => {
     }
   };
 
-  const generateAndDownloadExam = async () => {
-    fetch('/api/generate_exam')
-        .then(response => response.blob())
-        .then(blob => {
-            // 创建一个下载链接
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'exam.docx';  // 设置下载文件的名称
-            link.click();
-        })
-        .catch(error => console.error('Error:', error));
-}
-  
-const handleDownload = () => {
-  fetch('/api/generate_markdown')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.blob();
-    })
-    .then(blob => {
-      // 创建一个下载链接
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'study_plan.md';  // 设置下载文件的名称
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    })
-    .catch(error => {
-      console.error('Error downloading file:', error);
-      message.error('下载文件失败，请稍后重试');
-    });
-};
   return (
     <Layout className="home-layout">
       <Header className="header">
@@ -198,14 +163,6 @@ const handleDownload = () => {
                 style={{ marginRight: '10px' }}
               >
                 生成学习计划
-              </Button>
-              <Button 
-                type="primary" 
-                ghost
-                icon={<DownloadOutlined />}
-                onClick={() => generateAndDownloadExam()}
-              >
-                生成试题并下载
               </Button>
             </div>
           </Form>

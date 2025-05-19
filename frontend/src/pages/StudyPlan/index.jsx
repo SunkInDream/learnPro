@@ -28,7 +28,23 @@ const StudyPlan = () => {
   const [editingKey, setEditingKey] = useState('');
   const [form] = Form.useForm();
   const navigate = useNavigate();
-
+  const generateAndDownloadExam = async (subject, difficulty) => {
+  // 科目和难度系数作为查询参数传递给后端
+  fetch(`/api/generate_exam?subject=${encodeURIComponent(subject)}&difficulty=${difficulty}`)
+    .then(response => response.blob())
+    .then(blob => {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${subject}试卷(难度${difficulty}).docx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      message.error('下载失败，请重试');
+    });
+}
   const columns = [
     {
       title: '时间段',
@@ -55,10 +71,21 @@ const StudyPlan = () => {
       key: 'exercises',
       width: 100,
       render: (text, record) => record.type === 'study' ? (
-        <Button type="link" onClick={() => handleDownload(text)}>
-          下载
-        </Button>
-      ) : null,
+      <Button type="link" onClick={() => {
+        const subject = record.content.split(' - ')[0];
+        
+        console.log("下载数据:", {
+          记录: record,
+          科目: subject,
+          原始难度值: record.difficulty,
+          难度类型: typeof record.difficulty
+        });
+        
+        generateAndDownloadExam(subject, record.difficulty || 5);
+      }}>
+        下载
+      </Button>
+    ) : null,
     },
     {
       title: '得分',
