@@ -5,6 +5,8 @@ from app.models.LLM import main as llm_query
 from flask import Flask, jsonify, request, send_file, make_response
 from docx import Document
 import os
+from urllib.parse import quote
+
 CORS(app)
 
 
@@ -112,48 +114,44 @@ def chat():
         return {'error': f'处理请求时出错: {str(e)}'}, 500
 @app.route('/api/generate_exam', methods=['GET'])
 def generate_exam():
-    import io
+    subject = request.args.get('subject', '通用')
+    difficulty = request.args.get('difficulty', '5')
     
-    # 生成试题（模拟调用AI API生成试题）
-    questions = [
-        "1. 求下列函数的导数：f(x) = 2x^3 - 5x + 3",
-        "2. 求下列函数在x=1处的导数：f(x) = sin(x)",
-        "3. 求下列函数的导数并求出其极值：f(x) = x^4 - 4x^3 + 6x^2 - 3x + 2"
-    ]
+    try:
+        llm_response = llm_query(user_question="", subject=subject, difficulty=difficulty)
+        if isinstance(llm_response, dict) and 'result' in llm_response:
+            response_text = llm_response['result']
+            questions = [line.strip() for line in response_text.split('\n')
+                         if any(line.strip().startswith(f"{i}.") for i in range(1, 11))]
+            if not questions:
+                questions = [
+                    f"1. {subject}(难度{difficulty}/10)：求下列函数的导数：f(x) = 2x^3 - 5x + 3",
+                    f"2. {subject}(难度{difficulty}/10)：求下列函数在x=1处的导数：f(x) = sin(x)",
+                    f"3. {subject}(难度{difficulty}/10)：求下列函数的导数并求出其极值：f(x) = x^4 - 4x^3 + 6x^2 - 3x + 2"
+                ]
+        else:
+            questions = [
+                f"1. {subject}(难度{difficulty}/10)：求下列函数的导数：f(x) = 2x^3 - 5x + 3",
+                f"2. {subject}(难度{difficulty}/10)：求下列函数在x=1处的导数：f(x) = sin(x)",
+                f"3. {subject}(难度{difficulty}/10)：求下列函数的导数并求出其极值：f(x) = x^4 - 4x^3 + 6x^2 - 3x + 2"
+            ]
+    except Exception as e:
+        print(f"生成题目错误: {e}")
+        questions = [
+            f"1. {subject}(难度{difficulty}/10)：求下列函数的导数：f(x) = 2x^3 - 5x + 3",
+            f"2. {subject}(难度{difficulty}/10)：求下列函数在x=1处的导数：f(x) = sin(x)",
+            f"3. {subject}(难度{difficulty}/10)：求下列函数的导数并求出其极值：f(x) = x^4 - 4x^3 + 6x^2 - 3x + 2"
+        ]
 
-    # 创建 DOCX 文件
-    doc = Document()
-    doc.add_heading('导数试卷', 0)
-    doc.add_heading('一、选择题', level=1)
-    for question in questions:
-        doc.add_paragraph(question)
+    # --- 改为生成 Markdown 并返回 ---
+    markdown_lines = [f"# {subject} 试卷 (难度{difficulty}/10)", ""]
+    for q in questions:
+        markdown_lines.append(q)
+    markdown_content = "\n\n".join(markdown_lines)
 
-    # 保存到内存流中，而不是文件
-    file_stream = io.BytesIO()
-    doc.save(file_stream)
-    file_stream.seek(0)
-
-    # 直接从内存中发送文件
-    return send_file(
-        file_stream,
-        mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        as_attachment=True,
-        download_name='导数试卷.docx'
-    )
-@app.route('/api/generate_markdown', methods=['GET'])
-def generate_markdown():
-    # 创建Markdown内容
-    markdown_content = """# 学习计划
-    
-## 今日任务
-- 复习高数第三章
-- 完成物理作业
-- 阅读英语文章
-    """
-    
-    # 创建响应
     response = make_response(markdown_content)
-    response.headers["Content-Disposition"] = "attachment; filename=study_plan.md"
-    response.headers["Content-Type"] = "text/markdown"
-    
+    filename = f"{subject}_试卷_难度{difficulty}.md"
+    # 使用 RFC5987 编码中文文件名，避免 Latin-1 编码错误
+    response.headers["Content-Disposition"] = f"attachment; filename*=UTF-8''{quote(filename)}"
+    response.headers["Content-Type"] = "text/markdown; charset=utf-8"
     return response

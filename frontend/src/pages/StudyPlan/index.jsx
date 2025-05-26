@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Layout, Menu, Table, Button, Modal, Form, Input, Select, TimePicker, InputNumber, Space, message } from 'antd';
+import React, { useState, useRef } from 'react';
+import { Layout, Menu, Table, Button, Modal, Form, Input, Select, TimePicker, InputNumber, Space, message, Progress } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
@@ -28,23 +28,43 @@ const StudyPlan = () => {
   const [editingKey, setEditingKey] = useState('');
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const generateAndDownloadExam = async (subject, difficulty) => {
-  // 科目和难度系数作为查询参数传递给后端
-  fetch(`/api/generate_exam?subject=${encodeURIComponent(subject)}&difficulty=${difficulty}`)
-    .then(response => response.blob())
-    .then(blob => {
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `${subject}试卷(难度${difficulty}).docx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      message.error('下载失败，请重试');
-    });
-}
+  const [downloading, setDownloading] = useState(false);
+  const [percent, setPercent] = useState(0);
+  const timerRef = useRef(null);
+
+  const generateAndDownloadExam = (subject, difficulty) => {
+    // 打开进度条 Modal
+    setDownloading(true);
+    setPercent(0);
+    // 模拟进度增长
+    timerRef.current = window.setInterval(() => {
+      setPercent(p => Math.min(p + Math.random() * 5, 95));
+    }, 500);
+
+    const url = `/api/generate_exam?subject=${encodeURIComponent(subject)}&difficulty=${difficulty}`;
+    fetch(url)
+      .then(res => {
+        clearInterval(timerRef.current);
+        setPercent(100);
+        return res.blob();
+      })
+      .then(blob => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${subject}试卷(难度${difficulty}).md`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch(err => {
+        console.error(err);
+        message.error('下载失败');
+      })
+      .finally(() => {
+        // 延迟关闭进度条，让用户看到 100%
+        setTimeout(() => setDownloading(false), 500);
+      });
+  }
   const columns = [
     {
       title: '时间段',
@@ -176,11 +196,12 @@ const StudyPlan = () => {
   };
 
   return (
+  <>
     <Layout className="study-plan-layout">
       <Header className="header">
         <div className="logo">学习助手</div>
         <Menu mode="horizontal" theme="dark">
-        <Menu.Item key="home" onClick={() => navigate('/')}>首页</Menu.Item>
+          <Menu.Item key="home" onClick={() => navigate('/')}>首页</Menu.Item>
           <Menu.Item key="plan" onClick={() => navigate('/study-plan')}>学习计划</Menu.Item>
           <Menu.Item key="feedback" onClick={() => navigate('/feedback')}>反馈</Menu.Item>
           <Menu.Item key="user" onClick={() => navigate('/user')}>个人中心</Menu.Item>
@@ -277,6 +298,15 @@ const StudyPlan = () => {
         </Modal>
       </Content>
     </Layout>
+    <Modal
+        title="正在生成试卷，请稍候..."
+        visible={downloading}
+        footer={null}
+        closable={false}
+      >
+        <Progress percent={Math.floor(percent)} status={percent < 100 ? 'active' : 'success'} />
+      </Modal>
+    </>
   );
 };
 
