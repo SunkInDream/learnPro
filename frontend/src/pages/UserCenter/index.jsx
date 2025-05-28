@@ -12,6 +12,7 @@ import StudyPlan from './components/StudyPlan';
 import KnowledgeTraining from './components/KnowledgeTraining';
 import './index.less';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const { Header, Sider, Content } = Layout;
 

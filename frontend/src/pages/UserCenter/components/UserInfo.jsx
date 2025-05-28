@@ -25,7 +25,9 @@ const UserInfo = (props) => {
         const username = localStorage.getItem('username');
         // 将用户名作为查询参数添加到请求中
         const response = await request.get(`/api/user/info?username=${username}`);
-        
+
+        console.log('获取用户信息:', response.data);
+
         if (response.data) {
           const data = response.data;
           setUserInfo(data);
@@ -55,11 +57,11 @@ const UserInfo = (props) => {
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     if (!isJpgOrPng) {
-      message.error('只能上传 JPG/PNG 格式的图片！');
+      message.error('只能上传 JPG/PNG 格式的图片!');
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      message.error('图片必须小于 2MB！');
+      message.error('图片必须小于 2MB!');
     }
     return isJpgOrPng && isLt2M;
   };
@@ -119,6 +121,11 @@ const UserInfo = (props) => {
     }
   };
 
+  
+  useEffect(() => {
+    console.log('当前 imageUrl:', imageUrl);
+  }, [imageUrl]);
+
   return (
     <div className="user-info">
       <Card
@@ -149,14 +156,15 @@ const UserInfo = (props) => {
                     listType="picture-card"
                     className="avatar-uploader"
                     showUploadList={false}
-                    action="/api/upload"
+                    action="/api/uploadimg"
+                    data={{ username:userInfo.username}}
                     beforeUpload={beforeUpload}
                     onChange={handleChange}
                     disabled={!isEditing}
                   >
                     {imageUrl ? (
                       <img 
-                        src={imageUrl} 
+                        src={imageUrl}
                         alt="avatar" 
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                       />

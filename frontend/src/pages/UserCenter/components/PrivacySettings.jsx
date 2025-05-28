@@ -16,12 +16,25 @@ const PrivacySettings = () => {
   const [newRestPlace, setNewRestPlace] = useState('');
   const [newDiningPlace, setNewDiningPlace] = useState('');
 
+
   // 添加休息地点
-  const handleAddRestPlace = () => {
+  const handleAddRestPlace = async () => {
     if (!newRestPlace.trim()) {
       message.warning('请输入休息方式');
       return;
     }
+    const username = localStorage.getItem('username');
+    await fetch('/api/addrestway', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username,
+        rest_type: newRestPlace
+      })
+    });
+
     const updatedPlaces = [...restPlaces, {
       id: Date.now(),
       content: newRestPlace
@@ -32,11 +45,19 @@ const PrivacySettings = () => {
   };
 
   // 添加就餐地点
-  const handleAddDiningPlace = () => {
+  const handleAddDiningPlace = async () => {
     if (!newDiningPlace.trim()) {
       message.warning('请输入就餐地点');
       return;
     }
+
+    const username = localStorage.getItem('username');
+    await fetch('/api/addeatplace', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, place_name: newDiningPlace })
+    });
+
     const updatedPlaces = [...diningPlaces, {
       id: Date.now(),
       content: newDiningPlace
@@ -67,7 +88,7 @@ const PrivacySettings = () => {
   return (
     <div className="privacy-settings">
       <div className="privacy-settings-title"><h2>隐私与个性化设置</h2></div>
-      
+
       <Card style={{ marginBottom: 24 }}>
         <Alert
           message="隐私声明"
@@ -92,7 +113,7 @@ const PrivacySettings = () => {
           >
             <Switch />
           </Form.Item>
-          
+
           <Form.Item
             name="dataCollection"
             label="学习数据收集"
@@ -100,7 +121,7 @@ const PrivacySettings = () => {
           >
             <Switch />
           </Form.Item>
-          
+
           <Form.Item>
             <div className='b'>
               <Button type="primary" htmlType="submit">
@@ -114,8 +135,8 @@ const PrivacySettings = () => {
       <Card title="个性化偏好设置" style={{ marginBottom: 24 }}>
         <Row gutter={16}>
           <Col span={12}>
-            <Card 
-              title="休息方式" 
+            <Card
+              title="休息方式"
               size="small"
               extra={
                 <Space>
@@ -141,9 +162,9 @@ const PrivacySettings = () => {
                 renderItem={item => (
                   <List.Item
                     actions={[
-                      <Button 
-                        type="text" 
-                        danger 
+                      <Button
+                        type="text"
+                        danger
                         icon={<DeleteOutlined />}
                         onClick={() => handleDeleteRestPlace(item.id)}
                       />
@@ -155,10 +176,10 @@ const PrivacySettings = () => {
               />
             </Card>
           </Col>
-          
+
           <Col span={12}>
-            <Card 
-              title="常去就餐地点" 
+            <Card
+              title="常去就餐地点"
               size="small"
               extra={
                 <Space>
@@ -184,9 +205,9 @@ const PrivacySettings = () => {
                 renderItem={item => (
                   <List.Item
                     actions={[
-                      <Button 
-                        type="text" 
-                        danger 
+                      <Button
+                        type="text"
+                        danger
                         icon={<DeleteOutlined />}
                         onClick={() => handleDeleteDiningPlace(item.id)}
                       />

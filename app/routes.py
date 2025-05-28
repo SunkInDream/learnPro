@@ -1,9 +1,11 @@
 from flask_cors import CORS
-from app.models.database import db, User, app
+from app.models.database import db, User, app, LoginList, EatPlace, RestWay
+from datetime import datetime, date, timedelta
 from flask_sqlalchemy import SQLAlchemy
 from app.models.LLM import main as llm_query
-from flask import Flask, jsonify, request, send_file, make_response
+from flask import Flask, jsonify, request, send_file, make_response, send_from_directory
 from docx import Document
+from werkzeug.utils import secure_filename
 import os
 CORS(app)
 
@@ -18,7 +20,7 @@ def login():
     if not credentials_valid:
         return {'error': 'Invalid credentials'}, 401
     else:
-        return {'success': True}, 200
+        return {'success': True}, 200 #200是HTTP状态码，表示请求成功
     
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -41,6 +43,7 @@ def display_user_info():
     if user is None:
         return {'error': 'User not found'}, 404
     else:
+        study_days = LoginList.query.filter_by(user_id=user.id).distinct(db.func.date(LoginList.login_time)).count()
         return {
             'username': user.username, 
             'email': user.email, 
@@ -49,8 +52,67 @@ def display_user_info():
             'grade': user.grade,
             'birthday': user.birthday,
             'targetSchool': user.targetSchool,
-            'bio': user.bio
+            'bio': user.bio,
+            'avatar': user.avatar,
+            'studyDays': study_days,
+            'focusTime': user.focusTime,
+            'lastLoginTime': user.lastLoginTime
         }, 200  
+
+
+
+@app.route('/api/punch', methods=['POST'])
+def punch():
+    data = request.get_json()
+    username = data.get('username')
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return {'error': 'User not found'}, 404
+
+    today = date.today()
+    existing = LoginList.query.filter_by(user_id=user.id, login_date=today).first()
+    if not existing:
+        login_record = LoginList(
+            user_id=user.id,
+            login_time=datetime.now(),
+            login_date=today,
+            ip_address=request.remote_addr or 'unknown'
+        )
+        db.session.add(login_record)
+        db.session.commit()
+    return {'success': True}, 200
+
+
+@app.route('/api/addeatplace', methods=['POST'])
+def add_eat_place():
+    data = request.get_json()
+    username = data.get('username')
+    place_name = data.get('place_name')
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return {'error': 'User not found'}, 404
+
+    eat_place = EatPlace(user_id=user.id, place_name=place_name)
+    db.session.add(eat_place)
+    db.session.commit()
+
+    return {'success': True}, 200
+
+@app.route('/api/addrestway', methods=['POST'])
+def add_rest_way():
+    data = request.get_json()
+    username = data.get('username')
+    rest_type = data.get('rest_type')
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return {'error': 'User not found'}, 404
+
+    rest_way = RestWay(user_id=user.id, rest_type=rest_type)
+    db.session.add(rest_way)
+    db.session.commit()
+
+    return {'success': True}, 200
+
 
 @app.route('/api/user/update', methods=['POST'])
 def update_user_info():
@@ -65,9 +127,49 @@ def update_user_info():
         user.birthday = data.get('birthday')
         user.targetSchool = data.get('targetSchool')
         user.bio = data.get('bio')
+
+        # user.avatar = data.get('avatar')
+        # user.focusTime = data.get('focusTime')
+        # user.lastLoginTime = data.get('lastLoginTime')
+
         db.session.commit()
         return {'success': True}, 200
     
+@app.route('/api/uploadimg', methods=['POST'])
+def upload_image():
+    username = request.form.get('username')
+    file = request.files.get('avatar')
+
+    if not username or not file:
+        return {'error': '用户名或文件为空'}, 400
+
+    db_dir = os.path.dirname(os.path.abspath(__file__)) 
+    models_dir = os.path.join(db_dir, 'models')          
+    if not os.path.exists(models_dir):
+        models_dir = os.path.dirname(db_dir)             
+
+    static_dir = os.path.join(models_dir, 'static')
+    upload_folder = os.path.join(static_dir, 'uploads')
+    os.makedirs(upload_folder, exist_ok=True)
+
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(upload_folder, filename)
+    file.save(filepath)
+
+    image_url = f"http://localhost:5000/static/uploads/{filename}"
+
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return {'error': '用户不存在'}, 404
+
+    user.avatar = image_url
+    db.session.commit()
+
+    return {'success': True, 'imageUrl': image_url}, 200
+
+
+
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.get_json()
@@ -110,6 +212,7 @@ def chat():
         error_details = traceback.format_exc()
         print(f"聊天API错误: {str(e)}\n{error_details}")
         return {'error': f'处理请求时出错: {str(e)}'}, 500
+
 @app.route('/api/generate_exam', methods=['GET'])
 def generate_exam():
     import io
@@ -157,3 +260,8 @@ def generate_markdown():
     response.headers["Content-Type"] = "text/markdown"
     
     return response
+
+@app.route('/static/uploads/<filename>')
+def serve_uploaded_file(filename):
+    return send_from_directory(os.path.join('static', 'uploads'), filename)
+
