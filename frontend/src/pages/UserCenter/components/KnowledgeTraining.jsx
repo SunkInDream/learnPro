@@ -1,313 +1,524 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Progress, List, Tag, Button, Modal, Form, Input, DatePicker, InputNumber, message, Select } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import moment from 'moment';
+import React, { useState, useEffect } from "react";
+import { Button, Card, List, Modal, Form, Input, Select, DatePicker, InputNumber, message, Empty, Spin } from "antd";
+import dayjs from "dayjs";
+import "dayjs/locale/zh-cn";
 
-const getInitialKnowledgePoints = () => {
-  const savedPoints = localStorage.getItem('knowledgePoints');
-  return savedPoints ? JSON.parse(savedPoints) : [
-    {
-      key: '1',
-      topic: '函数与导数',
-      mastery: 8,
-      records: [
-        { id: '1', date: '2024-03-19', score: 90, problems: 10 },
-        { id: '2', date: '2024-03-20', score: 85, problems: 8 }
-      ]
-    },
-    {
-      key: '2',
-      topic: '概率统计',
-      mastery: 6,
-      records: [
-        { id: '3', date: '2024-03-18', score: 75, problems: 12 }
-      ]
-    }
-  ];
-};
+const { Option } = Select;
+const { TextArea } = Input;
 
-const KnowledgeTraining = () => {
-  const [editModalVisible, setEditModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState(null);
-  const [currentKnowledgePoint, setCurrentKnowledgePoint] = useState(null);
+const allSubjects = [
+  {
+    label: "数学",
+    value: "math",
+    chapters: [
+      {
+        label: "函数",
+        value: "function",
+        topics: [
+          { label: "一次函数", value: "linear" },
+          { label: "二次函数", value: "quadratic" },
+          { label: "指数函数", value: "exponential" },
+        ],
+      },
+      {
+        label: "几何",
+        value: "geometry",
+        topics: [
+          { label: "三角形", value: "triangle" },
+          { label: "圆", value: "circle" },
+        ],
+      },
+    ],
+  },
+  {
+    label: "物理",
+    value: "physics",
+    chapters: [
+      {
+        label: "力学",
+        value: "mechanics",
+        topics: [
+          { label: "牛顿运动定律", value: "newton" },
+          { label: "动能定理", value: "energy" },
+        ],
+      },
+    ],
+  },
+];
+
+const KnowledgeManager = () => {
   const [form] = Form.useForm();
-  const [addKnowledgeModalVisible, setAddKnowledgeModalVisible] = useState(false);
   const [knowledgeForm] = Form.useForm();
-  
-  const [knowledgePoints, setKnowledgePoints] = useState(getInitialKnowledgePoints);
 
-  // 当知识点数据更新时，保存到 localStorage
+  const [records, setRecords] = useState([]);
+  const [knowledgePoints, setKnowledgePoints] = useState([]);
+  const [selectedKnowledge, setSelectedKnowledge] = useState(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [addKnowledgeModalVisible, setAddKnowledgeModalVisible] = useState(false);
+  const [recordModalVisible, setRecordModalVisible] = useState(false);
+  const [questionModalVisible, setQuestionModalVisible] = useState(false); // 控制生成题目 Modal 的显示
+
+  const [loadingQuestions, setLoadingQuestions] = useState(false); // 控制 Spin 加载状态
+
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [selectedChapter, setSelectedChapter] = useState(null);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [chapters, setChapters] = useState([]);
+  const [topics, setTopics] = useState([]);
+
+  // 选中的学科，用于学科导航
+  const [filterSubject, setFilterSubject] = useState(null);
+  const [userGrade, setUserGrade] = useState(null);
+
+  const [generatedQuestion, setGeneratedQuestion] = useState(null); // 生成的题目对象
+
+  const [showFullQuestions, setShowFullQuestions] = useState(false); // 控制是否显示完整题目
+
   useEffect(() => {
-    localStorage.setItem('knowledgePoints', JSON.stringify(knowledgePoints));
-  }, [knowledgePoints]);
+    const storedRecords = localStorage.getItem("records");
+    const storedKnowledgePoints = localStorage.getItem("knowledgePoints");
 
-  // 打开编辑模态框
-  const handleEdit = (record, knowledgePoint) => {
-    setCurrentRecord(record);
-    setCurrentKnowledgePoint(knowledgePoint);
-    form.setFieldsValue({
-      date: moment(record.date),
-      score: record.score,
-      problems: record.problems
-    });
-    setEditModalVisible(true);
-  };
+    if (storedRecords) setRecords(JSON.parse(storedRecords));
+    if (storedKnowledgePoints) setKnowledgePoints(JSON.parse(storedKnowledgePoints));
 
-  // 删除记录
-  const handleDelete = (recordId, knowledgePoint) => {
-    const updatedPoints = knowledgePoints.map(point => {
-      if (point.key === knowledgePoint.key) {
-        return {
-          ...point,
-          records: point.records.filter(r => r.id !== recordId)
-        };
-      }
-      return point;
-    });
-    setKnowledgePoints(updatedPoints);
-    message.success('删除成功');
-  };
-
-  // 保存编辑或添加新记录
-  const handleSave = async (values) => {
-    try {
-      const updatedPoints = knowledgePoints.map(point => {
-        if (point.key === currentKnowledgePoint.key) {
-          if (currentRecord) {
-            // 编辑现有记录
-            return {
-              ...point,
-              records: point.records.map(record => {
-                if (record.id === currentRecord.id) {
-                  return {
-                    ...record,
-                    date: values.date.format('YYYY-MM-DD'),
-                    score: values.score,
-                    problems: values.problems
-                  };
-                }
-                return record;
-              })
-            };
+    const username = localStorage.getItem("username");
+    if (username) {
+      fetch(`/api/user/info?username=${username}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && !data.error && data.grade !== undefined) {
+            setUserGrade(data.grade);
           } else {
-            // 添加新记录
-            const newRecord = {
-              id: Date.now().toString(), // 生成唯一ID
-              date: values.date.format('YYYY-MM-DD'),
-              score: values.score,
-              problems: values.problems
-            };
-            return {
-              ...point,
-              records: [...point.records, newRecord]
-            };
+            message.error("获取用户信息失败");
           }
-        }
-        return point;
-      });
-      
-      setKnowledgePoints(updatedPoints);
-      setEditModalVisible(false);
-      message.success(currentRecord ? '更新成功' : '添加成功');
-    } catch (error) {
-      message.error(currentRecord ? '更新失败' : '添加失败');
+        })
+        .catch((error) => {
+          console.error("获取用户信息出错:", error);
+          message.error("获取用户信息出错");
+        });
     }
+  }, []);
+
+  // 计算掌握度 = (所有得分总和 / (记录数*100)) * 10
+  const calculateMastery = (knowledgeName) => {
+    const relatedRecords = records.filter((r) => r.knowledge === knowledgeName);
+    if (relatedRecords.length === 0) return 0;
+    const totalScore = relatedRecords.reduce((sum, r) => sum + r.score, 0);
+    const mastery = Math.round((totalScore / (relatedRecords.length * 100)) * 10);
+    return mastery > 10 ? 10 : mastery;
   };
 
-  // 添加新记录
-  const handleAdd = (knowledgePoint) => {
-    setCurrentKnowledgePoint(knowledgePoint);
-    setCurrentRecord(null);
-    form.resetFields();
-    setEditModalVisible(true);
-  };
+  // 生成题目请求
+  const generateQuestions = async (knowledge) => {
+    console.log("生成题目请求", knowledge, { userGrade });
+    const kp = knowledgePoints.find((k) => k.name === knowledge);
+    if (!kp) return message.error("未找到知识点");
 
-  // 添加新知识点
-  const handleAddKnowledge = (values) => {
+    const subjectLabel = allSubjects.find((s) => s.value === kp.subject)?.label || "";
+    const mastery = calculateMastery(knowledge);
+
+    message.loading({ content: "题目生成中...", key: "generate" });
+    setLoadingQuestions(true); // 开启加载状态
     try {
-      const newKnowledge = {
-        key: Date.now().toString(),
-        topic: values.topic,
-        mastery: values.mastery || 0,
-        records: []
-      };
-      
-      setKnowledgePoints([...knowledgePoints, newKnowledge]);
-      setAddKnowledgeModalVisible(false);
-      knowledgeForm.resetFields();
-      message.success('添加知识点成功');
+      const res = await fetch("/api/generateQuestions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: subjectLabel,
+          difficulty: mastery,
+          knowledgeName: knowledge,
+          grade: userGrade,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setGeneratedQuestion(data.questions); // 将生成的题目存储到状态
+        message.success({ content: "题目生成成功！", key: "generate" });
+        setQuestionModalVisible(true); // 打开新的 Modal
+      } else {
+        message.error({ content: "题目生成失败", key: "generate" });
+      }
     } catch (error) {
-      message.error('添加知识点失败');
+      message.error({ content: "题目生成出错", key: "generate" });
+      console.error(error);
+    } finally {
+      setLoadingQuestions(false); // 关闭加载状态
     }
+  };
+
+  // 删除知识点时也要清理题目和记录
+  const handleDeleteKnowledge = (name) => {
+    Modal.confirm({
+      title: "确认删除该知识点？",
+      onOk: () => {
+        const newPoints = knowledgePoints.filter((k) => k.name !== name);
+        const newRecords = records.filter((r) => r.knowledge !== name);
+        setKnowledgePoints(newPoints);
+        setRecords(newRecords);
+        localStorage.setItem("knowledgePoints", JSON.stringify(newPoints));
+        localStorage.setItem("records", JSON.stringify(newRecords));
+        message.success("删除成功！");
+      },
+    });
+  };
+
+  const openRecordModal = (knowledgeName) => {
+    setSelectedKnowledge(knowledgeName);
+    setRecordModalVisible(true);
+  };
+
+  // 筛选知识点，只显示选中的学科
+  const filteredKnowledgePoints = filterSubject
+    ? knowledgePoints.filter((k) => k.subject === filterSubject)
+    : knowledgePoints;
+
+  // 添加知识点提交
+  const handleAddKnowledge = (values) => {
+    const topicLabel = selectedTopic ? topics.find((t) => t.value === selectedTopic)?.label : "";
+    const chapterLabel = selectedChapter ? chapters.find((c) => c.value === selectedChapter)?.label : "";
+    const subjectLabel = selectedSubject ? allSubjects.find((s) => s.value === selectedSubject)?.label : "";
+    const fullTopicName = `${subjectLabel}-${chapterLabel}-${topicLabel}`;
+
+    // 先判断是否已存在该知识点
+    if (knowledgePoints.some((k) => k.name === fullTopicName)) {
+      return message.warning("该知识点已存在！");
+    }
+
+    const newKnowledge = {
+      name: fullTopicName,
+      subject: selectedSubject,
+      chapter: selectedChapter,
+      topic: selectedTopic,
+      mastery: 0,
+      questions: [], // 新增题目字段
+    };
+
+    const updated = [...knowledgePoints, newKnowledge];
+    setKnowledgePoints(updated);
+    localStorage.setItem("knowledgePoints", JSON.stringify(updated));
+    setAddKnowledgeModalVisible(false);
+    resetAddKnowledgeForm();
+    message.success("知识点添加成功！");
+  };
+
+  const resetAddKnowledgeForm = () => {
+    setSelectedSubject(null);
+    setSelectedChapter(null);
+    setSelectedTopic(null);
+    setChapters([]);
+    setTopics([]);
+    knowledgeForm.resetFields();
   };
 
   return (
-    <div className="knowledge-training">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h2>知识点训练记录</h2>
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />}
-          onClick={() => setAddKnowledgeModalVisible(true)}
+    <div style={{ padding: 20 }}>
+      <h2>知识点掌握情况</h2>
+
+      {/* 学科导航 */}
+      <div style={{ marginBottom: 20 }}>
+        <Select
+          placeholder="按学科筛选"
+          style={{ width: 200 }}
+          allowClear
+          onChange={(val) => setFilterSubject(val)}
+          value={filterSubject}
         >
-          添加知识点
-        </Button>
+          {allSubjects.map((s) => (
+            <Option key={s.value} value={s.value}>
+              {s.label}
+            </Option>
+          ))}
+        </Select>
       </div>
 
-      <List
-        dataSource={knowledgePoints}
-        renderItem={item => (
-          <Card 
-            title={item.topic}
-            style={{ marginBottom: 16 }}
-            extra={
-              <div>
-                <Tag color="blue">掌握度: {item.mastery}/10</Tag>
-                <Button 
-                  type="primary" 
-                  icon={<EditOutlined />}
-                  onClick={() => handleAdd(item)}
-                  style={{ marginLeft: 8 }}
-                >
-                  添加记录
-                </Button>
-              </div>
-            }
-          >
-            <Progress percent={item.mastery * 10} />
-            <List
-              size="small"
-              header={<div>练习记录</div>}
-              dataSource={item.records}
-              renderItem={record => (
-                <List.Item
-                  actions={[
-                    <Button 
-                      type="link" 
-                      icon={<EditOutlined />}
-                      onClick={() => handleEdit(record, item)}
-                    >
-                      编辑
-                    </Button>,
-                    <Button 
-                      type="link" 
-                      danger 
-                      icon={<DeleteOutlined />}
-                      onClick={() => handleDelete(record.id, item)}
-                    >
+      <Button type="primary" onClick={() => setAddKnowledgeModalVisible(true)} style={{ marginBottom: 20 }}>
+        添加知识点
+      </Button>
+
+      {filteredKnowledgePoints.length === 0 ? (
+        <Empty description="暂无知识点" />
+      ) : (
+        <List
+          grid={{ gutter: 16, column: 2 }}
+          dataSource={filteredKnowledgePoints}
+          renderItem={(item) => {
+            // 找到该知识点的最近一次记录，按日期排序取最新的
+            const relatedRecords = records
+              .filter((r) => r.knowledge === item.name)
+              .sort((a, b) => (a.date < b.date ? 1 : -1)); // 降序
+            const latestRecord = relatedRecords.length > 0 ? relatedRecords[0] : null;
+
+            return (
+              <List.Item>
+                <Card
+                  title={item.name}
+                  extra={
+                    <Button size="small" onClick={() => handleDeleteKnowledge(item.name)} danger>
                       删除
                     </Button>
-                  ]}
+                  }
                 >
-                  <span>{record.date}</span>
-                  <span style={{ margin: '0 16px' }}>得分：{record.score}</span>
-                  <span>题目数：{record.problems}</span>
-                </List.Item>
-              )}
-            />
-          </Card>
-        )}
-      />
+                  掌握度：{calculateMastery(item.name)} / 10
+                  <br />
+                  {latestRecord ? (
+                    <div style={{ marginTop: 10, fontSize: 12, color: "#555" }}>
+                      最近一次记录时间：{latestRecord.date}，得分：{latestRecord.score}, 备注：{latestRecord.note || "无"}
+                    </div>
+                  ) : (
+                    <div style={{ marginTop: 10, fontSize: 12, color: "#999" }}>暂无学习记录</div>
+                  )}
+                  <div style={{ marginTop: 10 }}>
+                    <Button
+                      size="small"
+                      type="primary"
+                      onClick={() => {
+                        setModalVisible(true);
+                        setSelectedKnowledge(item.name);
+                      }}
+                    >
+                      添加记录
+                    </Button>
+                    <Button size="small" style={{ marginLeft: 10 }} onClick={() => openRecordModal(item.name)}>
+                      查看记录
+                    </Button>
 
+                  </div>
+                </Card>
+              </List.Item>
+            );
+          }}
+        />
+
+      )}
+
+      {/* 添加记录 Modal */}
       <Modal
-        title={currentRecord ? "编辑记录" : "添加记录"}
-        open={editModalVisible}
-        onCancel={() => setEditModalVisible(false)}
+        title="添加学习记录"
+        open={modalVisible}
+        onCancel={() => setModalVisible(false)}
         footer={null}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSave}
-        >
-          <Form.Item
-            label="日期"
-            name="date"
-            rules={[{ required: true, message: '请选择日期' }]}
-          >
+        <Form form={form} layout="vertical">
+          <Form.Item name="knowledge" initialValue={selectedKnowledge} hidden />
+          <Form.Item label="日期" name="date" rules={[{ required: true, message: "请选择日期" }]}>
             <DatePicker />
           </Form.Item>
-          
-          <Form.Item
-            label="得分"
-            name="score"
-            rules={[{ required: true, message: '请输入得分' }]}
-          >
-            <InputNumber min={0} max={100} />
-          </Form.Item>
-          
-          <Form.Item
-            label="题目数量"
-            name="problems"
-            rules={[{ required: true, message: '请输入题目数量' }]}
-          >
-            <InputNumber min={1} />
-          </Form.Item>
-
           <Form.Item>
-            <Button type="primary" htmlType="submit">
-              保存
-            </Button>
-            <Button 
-              onClick={() => setEditModalVisible(false)}
-              style={{ marginLeft: 8 }}
+            <Button
+              size="small"
+              style={{ marginLeft: 10 }}
+              onClick={() => {
+                const selectedDate = form.getFieldValue("date");
+                if (!selectedDate) {
+                  message.warning("请先选择日期！");
+                  return;
+                }
+                generateQuestions(selectedKnowledge);
+              }}
+              type="dashed"
             >
-              取消
+              生成题目
             </Button>
           </Form.Item>
         </Form>
       </Modal>
 
+      {/* 生成的题目 */}
       <Modal
-        title="添加新知识点"
-        open={addKnowledgeModalVisible}
-        onCancel={() => setAddKnowledgeModalVisible(false)}
+        title="生成的题目"
+        open={questionModalVisible}
+        onCancel={() => setQuestionModalVisible(false)}
         footer={null}
+        width={600}
       >
-        <Form
-          form={knowledgeForm}
-          layout="vertical"
-          onFinish={handleAddKnowledge}
-        >
-          <Form.Item
-            label="知识点名称"
-            name="topic"
-            rules={[{ required: true, message: '请选择知识点名称' }]}
-          >
-            <Select placeholder="请选择知识点">
-              <Select.Option value="导数">导数</Select.Option>
-              <Select.Option value="积分">积分</Select.Option>
-            </Select>
-          </Form.Item>
-          
-          <Form.Item
-            label="初始掌握度"
-            name="mastery"
-            initialValue={0}
-          >
-            <InputNumber 
-              min={0} 
-              max={10} 
-              placeholder="请输入初始掌握度(0-10)"
-              style={{ width: '100%' }}
+        {loadingQuestions ? (
+          <Spin tip="加载中..." style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }} />
+        ) : (
+          <>
+            <List
+              dataSource={generatedQuestion || []}
+              renderItem={(q, idx) => <List.Item key={idx}>{q}</List.Item>}
             />
-          </Form.Item>
+            <Form
+              form={form}
+              onFinish={(values) => {
+                const newRecords = [
+                  ...records,
+                  {
+                    ...values,
+                    knowledge: selectedKnowledge, // 确保记录的知识点名称正确
+                    date: values.date.format("YYYY-MM-DD"), // 格式化日期
+                    questions: generatedQuestion, // 将生成的题目绑定到该记录
+                  },
+                ];
 
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              保存
-            </Button>
-            <Button 
-              onClick={() => setAddKnowledgeModalVisible(false)}
-              style={{ marginLeft: 8 }}
+                localStorage.setItem("records", JSON.stringify(newRecords)); // 保存到本地存储
+                setRecords(newRecords); // 更新状态
+                form.resetFields();
+
+                // 更新掌握度
+                const updatedKnowledgePoints = knowledgePoints.map((k) => {
+                  if (k.name === selectedKnowledge) {
+                    return { ...k, mastery: calculateMastery(k.name) };
+                  }
+                  return k;
+                });
+
+                setKnowledgePoints(updatedKnowledgePoints);
+                localStorage.setItem("knowledgePoints", JSON.stringify(updatedKnowledgePoints));
+                message.success("记录添加成功！");
+                setQuestionModalVisible(false); // 关闭生成题目 Modal
+              }}
+              layout="vertical"
+              style={{ marginTop: 20 }}
             >
-              取消
-            </Button>
+              <Form.Item label="得分" name="score" rules={[{ required: true, message: "请输入得分" }]}>
+                <InputNumber min={0} max={100} style={{ width: "100%" }} />
+              </Form.Item>
+              <Form.Item label="备注" name="note">
+                <TextArea />
+              </Form.Item>
+              <Button type="primary" htmlType="submit">
+                提交记录
+              </Button>
+            </Form>
+          </>
+        )}
+      </Modal>
+
+      {/* 添加知识点 */}
+      <Modal
+        title="添加知识点"
+        open={addKnowledgeModalVisible}
+        onCancel={() => {
+          setAddKnowledgeModalVisible(false);
+          resetAddKnowledgeForm();
+        }}
+        onOk={() => knowledgeForm.submit()}
+        okText="提交"
+      >
+        <Form form={knowledgeForm} onFinish={handleAddKnowledge} layout="vertical">
+          <Form.Item label="知识点选择" required>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <Select
+                placeholder="请选择科目"
+                style={{ width: 120 }}
+                onChange={(value) => {
+                  setSelectedSubject(value);
+                  const subject = allSubjects.find((s) => s.value === value);
+                  setChapters(subject?.chapters || []);
+                  setSelectedChapter(null);
+                  setSelectedTopic(null);
+                  setTopics([]);
+                }}
+                value={selectedSubject}
+              >
+                {allSubjects.map((s) => (
+                  <Option key={s.value} value={s.value}>
+                    {s.label}
+                  </Option>
+                ))}
+              </Select>
+              <Select
+                placeholder="请选择章节"
+                style={{ width: 120 }}
+                onChange={(value) => {
+                  setSelectedChapter(value);
+                  const chapter = chapters.find((c) => c.value === value);
+                  setTopics(chapter?.topics || []);
+                  setSelectedTopic(null);
+                }}
+                value={selectedChapter}
+                disabled={!selectedSubject}
+              >
+                {chapters.map((c) => (
+                  <Option key={c.value} value={c.value}>
+                    {c.label}
+                  </Option>
+                ))}
+              </Select>
+              <Select
+                placeholder="请选择知识点"
+                style={{ width: 120 }}
+                onChange={(value) => setSelectedTopic(value)}
+                value={selectedTopic}
+                disabled={!selectedChapter}
+              >
+                {topics.map((t) => (
+                  <Option key={t.value} value={t.value}>
+                    {t.label}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+          </Form.Item>
+          <Form.Item name="mastery" label="掌握度（可选）">
+            <InputNumber min={0} max={10} />
           </Form.Item>
         </Form>
       </Modal>
+
+      {/* 查看记录和题目 */}
+      <Modal
+        title={`「${selectedKnowledge}」的学习记录及题目`}
+        open={recordModalVisible}
+        onCancel={() => setRecordModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <h3>学习记录</h3>
+        {records.filter((r) => r.knowledge === selectedKnowledge).length === 0 ? (
+          <Empty description="暂无记录" />
+        ) : (
+          <List
+            itemLayout="vertical"
+            dataSource={records.filter((r) => r.knowledge === selectedKnowledge)}
+            renderItem={(r, index) => (
+              <List.Item key={index}>
+                <strong>日期：</strong>
+                {r.date}
+                <br />
+                <strong>得分：</strong>
+                {r.score}
+                <br />
+                <strong>备注：</strong>
+                {r.note || "无"}
+                <br />
+                <strong>题目：</strong>
+                <Button
+                  type="link"
+                  onClick={() => {
+                    setSelectedKnowledge(r.knowledge); // 设置当前知识点
+                    setGeneratedQuestion(r.questions); // 设置当前记录的题目
+                    setShowFullQuestions(true); // 打开完整题目 Modal
+                  }}
+                >
+                  查看完整题目
+                </Button>
+              </List.Item>
+            )}
+          />
+        )}
+      </Modal>
+
+      {/* 在查看记录中显示完整题目 */}
+      {showFullQuestions && (
+        <Modal
+          title="完整题目"
+          open={showFullQuestions}
+          onCancel={() => setShowFullQuestions(false)}
+          footer={null}
+          width={600}
+        >
+          <List
+            dataSource={generatedQuestion || []}
+            renderItem={(q, idx) => <List.Item key={idx}>{q}</List.Item>}
+          />
+        </Modal>
+      )}
     </div>
   );
 };
 
-export default KnowledgeTraining;
+export default KnowledgeManager;

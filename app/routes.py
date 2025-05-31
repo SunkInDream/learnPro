@@ -8,7 +8,7 @@ from docx import Document
 from werkzeug.utils import secure_filename
 import os
 from urllib.parse import quote
-
+from app.models import LLM
 CORS(app)
 
 
@@ -214,6 +214,40 @@ def chat():
         error_details = traceback.format_exc()
         print(f"聊天API错误: {str(e)}\n{error_details}")
         return {'error': f'处理请求时出错: {str(e)}'}, 500
+
+
+@app.route("/api/generateQuestions", methods=["POST"])
+def generate_questions():
+    data = request.json
+    subject = data.get("subject")
+    difficulty = data.get("difficulty")
+    grade = data.get("grade")
+    knowledge = data.get("knowledgeName")
+
+    if not subject or difficulty is None:
+        return jsonify({"success": False, "msg": "参数缺失"}), 400
+
+    try:
+        response = LLM.main(subject=subject, difficulty=difficulty, grade=grade, knowledge=knowledge)
+        print("LLM response:", response)
+
+        # 直接取result字段，它是字符串
+        content = response.get("result", "")
+
+        if not content:
+            return jsonify({"success": False, "msg": "生成内容为空"}), 500
+
+        # 按数字序号拆分题目，正则更稳妥
+        import re
+        questions = re.findall(r'\d+\.\s*(.+?)(?=\n\d+\.|$)', content, re.S)
+
+        return jsonify({"success": True, "questions": questions})
+
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"success": False, "msg": "生成失败"}), 500
+    
+
 
 @app.route('/api/generate_exam', methods=['GET'])
 def generate_exam():

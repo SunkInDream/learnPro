@@ -25,12 +25,9 @@ const UserInfo = (props) => {
         const username = localStorage.getItem('username');
         // 将用户名作为查询参数添加到请求中
         const response = await request.get(`/api/user/info?username=${username}`);
-
-        console.log('获取用户信息:', response.data);
-
         if (response.data) {
           const data = response.data;
-          setUserInfo(data);
+          setUserInfo(data);// 设置userInfo
           setImageUrl(data.avatar);
           form.setFieldsValue({
             nickname: data.nickname || '',
