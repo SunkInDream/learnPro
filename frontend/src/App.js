@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Main from './pages/Main';
 import Home from './pages/Home';
 import UserCenter from './pages/UserCenter';
 import Feedback from './pages/Feedback';
@@ -51,13 +52,19 @@ function App() {
             </PublicRoute>
           } 
         />
-        
-        {/* 受保护的路由 */}
+        <Route 
+          path="/Home"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        />
         <Route 
           path="/" 
           element={
             <PrivateRoute>
-              <Home />
+              <Main />
             </PrivateRoute>
           } 
         />

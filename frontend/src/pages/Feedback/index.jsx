@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Head from '../Head'
 import { Layout, Menu, Card, Input, Button, Row, Col, Space, Image, List, message } from 'antd';
 import { SendOutlined, MailOutlined, PhoneOutlined, TeamOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -35,15 +36,7 @@ const Feedback = () => {
 
   return (
     <Layout className="feedback-layout">
-      <Header className="header">
-        <div className="logo">学习助手</div>
-        <Menu mode="horizontal" theme="dark">
-          <Menu.Item key="home" onClick={() => navigate('/')}>首页</Menu.Item>
-          <Menu.Item key="plan" onClick={() => navigate('/study-plan')}>学习计划</Menu.Item>
-          <Menu.Item key="feedback" onClick={() => navigate('/feedback')}>反馈</Menu.Item>
-          <Menu.Item key="user" onClick={() => navigate('/user')}>个人中心</Menu.Item>
-        </Menu>
-      </Header>
+      <Head/>
 
       <Content className="content">
         <Row gutter={[24, 24]}>

@@ -5,7 +5,7 @@ import ImgCrop from 'antd-img-crop';
 import moment from 'moment';
 import axios from 'axios';
 import './UserInfo.less';
-import request from '../../../utils/request';  // 使用你自己的配置的实例
+import request from '../../../utils/request';
 
 const { Option } = Select;
 const { TextArea } = Input;

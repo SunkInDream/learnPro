@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import Head from '../Head';
 import { Layout, Menu, Button, Card, Input, Upload, Space, message, TimePicker, Form } from 'antd';
 import { UploadOutlined, SendOutlined, DownloadOutlined, CalendarOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -108,15 +109,7 @@ const Home = () => {
 
   return (
     <Layout className="home-layout">
-      <Header className="header">
-        <div className="logo">学习助手</div>
-        <Menu mode="horizontal" theme="dark">
-          <Menu.Item key="home" onClick={() => navigate('/')}>首页</Menu.Item>
-          <Menu.Item key="plan" onClick={() => navigate('/study-plan')}>学习计划</Menu.Item>
-          <Menu.Item key="feedback" onClick={() => navigate('/feedback')}>反馈</Menu.Item>
-          <Menu.Item key="user" onClick={() => navigate('/user')}>个人中心</Menu.Item>
-        </Menu>
-      </Header>
+      <Head />
 
       <Content className="content">
         <Card title="AI 问答助手" className="qa-card">

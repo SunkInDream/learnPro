@@ -1,0 +1,288 @@
+.main-layout {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+  .main-header {
+    background: linear-gradient(135deg, #1890ff 0%, #722ed1 100%);
+    text-align: center;
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+
+    // 添加装饰性背景元素
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+      animation: float 20s linear infinite;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 1;
+
+      .main-title {
+        color: white !important;
+        margin-bottom: 16px;
+        font-size: 3.5rem;
+        font-weight: 700;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        letter-spacing: 2px;
+      }
+
+      .subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.4rem;
+        margin: 0;
+        font-weight: 300;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+
+  .main-content {
+    padding: 60px 24px;
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    background: linear-gradient(180deg, #f0f2f5 0%, #ffffff 100%);
+
+    .content-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+
+      .hero-section {
+        text-align: center;
+        margin-bottom: 100px;
+
+        .main-title {
+          font-size: 4rem;
+          font-weight: 700;
+          margin-bottom: 24px;
+          background: linear-gradient(135deg, #000000 0%, #000000 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          letter-spacing: 4px;
+          text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+          font-size: 1.5rem;
+          color: #666;
+          margin-bottom: 48px;
+          font-weight: 300;
+        }
+
+        .action-buttons {
+          display: flex;
+          justify-content: center;
+          gap: 24px;
+
+          .start-button {
+            height: 56px;
+            padding: 0 48px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 28px;
+            background: linear-gradient(135deg, #1066b5 0%, #1066b5 100%);
+            border: none;
+            box-shadow: 0 8px 16px #1066b5;
+            transition: all 0.3s ease;
+
+            &:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 12px 24px #1066b5;
+            }
+          }
+
+          .plan-button {
+            height: 56px;
+            padding: 0 48px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 28px;
+            border: 2px solid #1890ff;
+            color: #1890ff;
+            background: white;
+            box-shadow: 0 8px 16px rgba(24, 144, 255, 0.2);
+            transition: all 0.3s ease;
+
+            &:hover {
+              transform: translateY(-2px);
+              background: #1890ff;
+              color: white;
+              box-shadow: 0 12px 24px rgba(24, 144, 255, 0.3);
+            }
+          }
+        }
+      }
+
+      .feature-cards {
+        .feature-card {
+          border-radius: 16px;
+          border: none;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+          transition: all 0.3s ease;
+          overflow: hidden;
+          background: white;
+
+          &:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+          }
+
+          .card-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 140px;
+            font-size: 64px;
+            background: linear-gradient(135deg, #f0f2f5 0%, #e6f7ff 100%);
+
+            .anticon {
+              color: #1890ff;
+              transition: all 0.3s ease;
+            }
+          }
+
+          &:hover .card-icon .anticon {
+            transform: scale(1.1);
+            color: #722ed1;
+          }
+
+          .ant-card-body {
+            padding: 32px 24px;
+          }
+
+          .ant-card-meta-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 12px;
+            text-align: center;
+          }
+
+          .ant-card-meta-description {
+            color: #8c8c8c;
+            line-height: 1.6;
+            text-align: center;
+            font-size: 15px;
+          }
+        }
+      }
+    }
+  }
+
+  .main-footer {
+    background: linear-gradient(135deg, #001529 0%, #1890ff 100%);
+    padding: 60px 24px 30px;
+
+    .footer-card {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+
+      .ant-card-body {
+        padding: 24px 0;
+      }
+
+      h4 {
+        color: white !important;
+        margin-bottom: 20px;
+        font-weight: 600;
+        font-size: 18px;
+      }
+
+      p,
+      .ant-typography {
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 12px;
+        line-height: 1.6;
+      }
+
+      .anticon {
+        margin-right: 8px;
+        color: #40a9ff;
+      }
+    }
+  }
+}
+
+// 动画效果
+@keyframes float {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .main-layout {
+    .main-content {
+      padding: 40px 16px;
+
+      .content-wrapper {
+        .hero-section {
+          margin-bottom: 60px;
+
+          .main-title {
+            font-size: 3rem !important;
+            letter-spacing: 2px;
+          }
+
+          .subtitle {
+            font-size: 1.2rem;
+          }
+
+          .action-buttons {
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+
+            .ant-btn {
+              width: 100%;
+              max-width: 320px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .main-layout {
+    .main-content {
+      .content-wrapper {
+        .hero-section {
+          .main-title {
+            font-size: 2.5rem !important;
+            letter-spacing: 1px;
+          }
+
+          .subtitle {
+            font-size: 1.1rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// 全局优化
+.ant-layout {
+  background: transparent;
+}
+
+.ant-typography {
+  margin-bottom: 0;
+}

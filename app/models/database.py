@@ -94,6 +94,33 @@ class LoginList(db.Model):
         db.UniqueConstraint('user_id', 'login_date', name='unique_user_date'),
     )
 
+class Subject(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    chapter = db.relationship('Chapter', backref='subject', lazy=True)
+
+class Chapter(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
+    topic = db.relationship('Topic', backref='chapter', lazy=True)
+
+class Topic(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), nullable=False)
+    
+
+# math = Subject(name='数学')
+# english = Subject(name='英语')
+# biology = Subject(name='生物')
+# chinese = Subject(name='语文')
+# physics = Subject(name='物理')
+# chemistry = Subject(name='化学')
+# db.session.add_all([math, english, biology, chinese, physics, chemistry])
+# db.session.commit()
+
+
 
 with app.app_context():
     print("当前数据库文件路径：", db.engine.url.database)

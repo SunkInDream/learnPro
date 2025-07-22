@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import Head from '../Head';
 import { Layout, Menu, Table, Button, Modal, Form, Input, Select, TimePicker, InputNumber, Space, message, Progress } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -198,15 +199,7 @@ const StudyPlan = () => {
   return (
   <>
     <Layout className="study-plan-layout">
-      <Header className="header">
-        <div className="logo">学习助手</div>
-        <Menu mode="horizontal" theme="dark">
-          <Menu.Item key="home" onClick={() => navigate('/')}>首页</Menu.Item>
-          <Menu.Item key="plan" onClick={() => navigate('/study-plan')}>学习计划</Menu.Item>
-          <Menu.Item key="feedback" onClick={() => navigate('/feedback')}>反馈</Menu.Item>
-          <Menu.Item key="user" onClick={() => navigate('/user')}>个人中心</Menu.Item>
-        </Menu>
-      </Header>
+      <Head />
 
       <Content className="content">
         <div className="plan-header">

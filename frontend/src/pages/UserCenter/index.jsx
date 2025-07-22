@@ -10,6 +10,7 @@ import UserInfo from './components/UserInfo';
 import PrivacySettings from './components/PrivacySettings';
 import StudyPlan from './components/StudyPlan';
 import KnowledgeTraining from './components/KnowledgeTraining';
+import Head from '../Head';
 import './index.less';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -27,7 +28,7 @@ const getInitialUserInfo = () => {
     phone: '',
     email: ''
   };
-};  
+};
 
 const UserCenter = () => {
   const [selectedMenu, setSelectedMenu] = useState('userInfo');
@@ -46,7 +47,7 @@ const UserCenter = () => {
 
   // 渲染对应的内容组件
   const renderContent = () => {
-    switch(selectedMenu) {
+    switch (selectedMenu) {
       case 'userInfo':
         return <UserInfo userInfo={userInfo} onUpdate={handleUpdateUserInfo} />;
       case 'privacy':
@@ -66,33 +67,26 @@ const UserCenter = () => {
     // 或者只清除特定的项
     // localStorage.removeItem('isLoggedIn');
     // localStorage.removeItem('userInfo');
-    
+
     message.success('退出登录成功');
     navigate('/login', { replace: true });
   };
 
   return (
     <Layout className="user-center">
-      <Header className="header">
-        <div className="logo">学习助手</div>
-        <Menu mode="horizontal" theme="dark">
-          <Menu.Item key="home" onClick={() => navigate('/')}>首页</Menu.Item>
-          <Menu.Item key="plan" onClick={() => navigate('/study-plan')}>学习计划</Menu.Item>
-          <Menu.Item key="feedback" onClick={() => navigate('/feedback')}>反馈</Menu.Item>
-          <Menu.Item key="user" onClick={() => navigate('/user')}>个人中心</Menu.Item>
-        </Menu>
-        <div className="header-right">
-          <Space>
-            <Button type="primary" ghost onClick={() => navigate('/register')}>
-              注册
-            </Button>
-            <Button type="primary" onClick={handleLogout}>
-              退出登录
-            </Button>
-          </Space>
-        </div>
-      </Header>
-      
+      <Head/>
+      <div className="header-right">
+        <Space>
+          <Button type="primary" ghost onClick={() => navigate('/register')}>
+            注册
+          </Button>
+          <Button type="primary" onClick={handleLogout}>
+            退出登录
+          </Button>
+        </Space>
+      </div>
+
+
       <Layout>
         <Sider width={200} className="site-sider">
           <div className="user-brief">
@@ -105,7 +99,7 @@ const UserCenter = () => {
           <Menu
             mode="inline"
             selectedKeys={[selectedMenu]}
-            onSelect={({key}) => setSelectedMenu(key)}
+            onSelect={({ key }) => setSelectedMenu(key)}
             className="side-menu"
           >
             <Menu.Item key="userInfo" icon={<UserOutlined />}>
@@ -122,7 +116,7 @@ const UserCenter = () => {
             </Menu.Item>
           </Menu>
         </Sider>
-        
+
         <Content className="main-content">
           {renderContent()}
         </Content>
