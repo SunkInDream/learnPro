@@ -9,9 +9,10 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import 'antd/dist/reset.css';
 
-// 路由守卫组件
+// 私有路由守卫 - 需要登录才能访问
 const PrivateRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('isLoggedIn') === 'true';
+  console.log('PrivateRoute - 登录状态:', isAuthenticated);
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -20,9 +21,10 @@ const PrivateRoute = ({ children }) => {
   return children;
 };
 
-// 公共路由组件
+// 公共路由守卫 - 已登录用户不能访问（如登录页、注册页）
 const PublicRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('isLoggedIn') === 'true';
+  console.log('PublicRoute - 登录状态:', isAuthenticated);
   
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
@@ -35,7 +37,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* 公共路由 */}
+        {/* ===== 公共路由（未登录用户可访问）===== */}
         <Route 
           path="/login" 
           element={
@@ -52,14 +54,9 @@ function App() {
             </PublicRoute>
           } 
         />
-        <Route 
-          path="/Home"
-          element={
-            <PrivateRoute>
-              <Home />
-            </PrivateRoute>
-          }
-        />
+        
+        {/* ===== 私有路由（需要登录才能访问）===== */}
+        {/* 首页 */}
         <Route 
           path="/" 
           element={
@@ -68,6 +65,18 @@ function App() {
             </PrivateRoute>
           } 
         />
+        
+        {/* 主页面（如果Main和Home是不同页面的话） */}
+        <Route 
+          path="/home" 
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        />
+        
+        {/* 用户中心 */}
         <Route 
           path="/user" 
           element={
@@ -76,6 +85,8 @@ function App() {
             </PrivateRoute>
           } 
         />
+        
+        {/* 反馈页面 */}
         <Route 
           path="/feedback" 
           element={
@@ -84,6 +95,8 @@ function App() {
             </PrivateRoute>
           } 
         />
+        
+        {/* 学习计划 */}
         <Route 
           path="/study-plan" 
           element={
@@ -93,7 +106,7 @@ function App() {
           } 
         />
         
-        {/* 将未匹配的路由重定向到首页或登录页面 */}
+        {/* ===== 404和兜底路由 ===== */}
         <Route 
           path="*" 
           element={

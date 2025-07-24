@@ -1,5 +1,5 @@
 from flask_cors import CORS
-from app.models.database import db, User, app, LoginList, EatPlace, RestWay
+from app.models.database import db, User, app, LoginList, EatPlace, RestWay,ExerciseQuestion
 from datetime import datetime, date, timedelta
 from flask_sqlalchemy import SQLAlchemy
 from app.models.LLM import main as llm_query
@@ -247,7 +247,31 @@ def generate_questions():
         print("Error:", e)
         return jsonify({"success": False, "msg": "生成失败"}), 500
     
+@app.route('/api/saveQuestions', methods=['POST'])
+def save_questions():
+    data = request.json
+    questions = data.get("questions")
+    knowledge_name = data.get("knowledgeName")
+    user_grade = data.get("userGrade")
+    user_id = data.get("userId")
 
+    if not questions or not knowledge_name or not user_grade:
+        return jsonify({"success": False, "msg": "参数缺失"}), 400
+
+    try:
+        exercise_question = ExerciseQuestion(
+            user_id=user_id,
+            questions=questions,
+            answer="",
+            difficulty=5  # 默认难度
+        )
+        db.session.add(exercise_question)
+        db.session.commit()
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"success": False, "msg": "保存失败"}), 500
+    
 
 @app.route('/api/generate_exam', methods=['GET'])
 def generate_exam():

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Layout, Button, Card, Typography, Space, Row, Col } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import Head from '../Head';
 import { 
   BookOutlined, 
@@ -15,6 +16,7 @@ const { Content, Footer } = Layout;
 const { Title, Paragraph, Text } = Typography;
 
 export default function Main() {
+  const navigate = useNavigate();
   return (
     <Layout className="main-layout">
       <Head/>
@@ -34,6 +36,7 @@ export default function Main() {
                 size="large" 
                 icon={<RocketOutlined />}
                 className="start-button"
+                onClick={() => navigate('/study-plan')}
               >
                 开始学习
               </Button>

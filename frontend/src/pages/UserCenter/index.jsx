@@ -62,11 +62,7 @@ const UserCenter = () => {
   };
 
   const handleLogout = () => {
-    // 清除所有相关的状态
-    localStorage.clear();  // 清除所有本地存储
-    // 或者只清除特定的项
-    // localStorage.removeItem('isLoggedIn');
-    // localStorage.removeItem('userInfo');
+    localStorage.clear();  
 
     message.success('退出登录成功');
     navigate('/login', { replace: true });
@@ -74,19 +70,7 @@ const UserCenter = () => {
 
   return (
     <Layout className="user-center">
-      <Head/>
-      <div className="header-right">
-        <Space>
-          <Button type="primary" ghost onClick={() => navigate('/register')}>
-            注册
-          </Button>
-          <Button type="primary" onClick={handleLogout}>
-            退出登录
-          </Button>
-        </Space>
-      </div>
-
-
+      <Head />
       <Layout>
         <Sider width={200} className="site-sider">
           <div className="user-brief">

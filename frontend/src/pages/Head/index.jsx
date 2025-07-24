@@ -10,7 +10,7 @@ export default function Head() {
     <Header className="header">
         <div className="logo">
           <div 
-            onClick={() => navigate('/')} 
+            onClick={() => navigate('/main')} 
             style={{
               color: 'white', 
               cursor: 'pointer',

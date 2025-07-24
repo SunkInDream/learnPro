@@ -26,6 +26,7 @@ class User(db.Model):
     eatplace = db.relationship('EatPlace', backref='user', lazy=True)
     knowledge_progresses = db.relationship('UserKnowledgeProgress', backref='user', lazy=True)
     exercise_records = db.relationship('ExerciseRecord', backref='user', lazy=True)
+    exercise_qustions = db.relationship('ExerciseQuestion', backref='user', lazy=True)
     def __init__(self, username, password, email, phone, nickname=None,grade=None,birthday=None,targetSchool=None,bio=None):
         self.username = username
         self.password = password
@@ -110,15 +111,13 @@ class Topic(db.Model):
     name = db.Column(db.String(100), nullable=False)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), nullable=False)
     
-
-# math = Subject(name='数学')
-# english = Subject(name='英语')
-# biology = Subject(name='生物')
-# chinese = Subject(name='语文')
-# physics = Subject(name='物理')
-# chemistry = Subject(name='化学')
-# db.session.add_all([math, english, biology, chinese, physics, chemistry])
-# db.session.commit()
+class ExerciseQuestion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    questions = db.Column(db.String(9999), nullable=False)
+    answer = db.Column(db.String(9999), nullable=False)
+    difficulty = db.Column(db.Integer, nullable=False) 
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 

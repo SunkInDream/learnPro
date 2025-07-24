@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Switch, Button, Card, Alert, Input, List, Space, Row, Col, Divider, message } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import './PrivacySettings.less';
+import './index.less';
 
 const PrivacySettings = () => {
   const [form] = Form.useForm();

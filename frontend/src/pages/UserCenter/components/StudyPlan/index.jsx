@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Table, Progress, Tabs, Empty, Tag, Timeline, Button } from 'antd';
 import { ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
-import './StudyPlan.less';
+import './index.less';
 
 const { TabPane } = Tabs;
 

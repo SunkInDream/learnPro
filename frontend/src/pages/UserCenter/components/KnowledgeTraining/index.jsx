@@ -6,50 +6,14 @@ import "dayjs/locale/zh-cn";
 const { Option } = Select;
 const { TextArea } = Input;
 
-const allSubjects = [
-  {
-    label: "数学",
-    value: "math",
-    chapters: [
-      {
-        label: "函数",
-        value: "function",
-        topics: [
-          { label: "一次函数", value: "linear" },
-          { label: "二次函数", value: "quadratic" },
-          { label: "指数函数", value: "exponential" },
-        ],
-      },
-      {
-        label: "几何",
-        value: "geometry",
-        topics: [
-          { label: "三角形", value: "triangle" },
-          { label: "圆", value: "circle" },
-        ],
-      },
-    ],
-  },
-  {
-    label: "物理",
-    value: "physics",
-    chapters: [
-      {
-        label: "力学",
-        value: "mechanics",
-        topics: [
-          { label: "牛顿运动定律", value: "newton" },
-          { label: "动能定理", value: "energy" },
-        ],
-      },
-    ],
-  },
-];
+
 
 const KnowledgeManager = () => {
   const [form] = Form.useForm();
   const [knowledgeForm] = Form.useForm();
 
+  const [allSubjects, setAllSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState([]);
   const [knowledgePoints, setKnowledgePoints] = useState([]);
   const [selectedKnowledge, setSelectedKnowledge] = useState(null);
@@ -74,31 +38,80 @@ const KnowledgeManager = () => {
   const [generatedQuestion, setGeneratedQuestion] = useState(null); // 生成的题目对象
 
   const [showFullQuestions, setShowFullQuestions] = useState(false); // 控制是否显示完整题目
-
   useEffect(() => {
-    const storedRecords = localStorage.getItem("records");
-    const storedKnowledgePoints = localStorage.getItem("knowledgePoints");
+    const loadData = async () => {
+      try {
+        setLoading(true);
 
-    if (storedRecords) setRecords(JSON.parse(storedRecords));
-    if (storedKnowledgePoints) setKnowledgePoints(JSON.parse(storedKnowledgePoints));
+        // 1. 加载学科数据
+        const response = await fetch('/static_data/subjects.json');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-    const username = localStorage.getItem("username");
-    if (username) {
-      fetch(`/api/user/info?username=${username}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data && !data.error && data.grade !== undefined) {
-            setUserGrade(data.grade);
+        const subjectsData = await response.json();
+        setAllSubjects(subjectsData);
+
+        // 2. 加载本地存储的数据
+        const storedRecords = localStorage.getItem("records");
+        const storedKnowledgePoints = localStorage.getItem("knowledgePoints");
+
+        if (storedRecords) setRecords(JSON.parse(storedRecords));
+        if (storedKnowledgePoints) setKnowledgePoints(JSON.parse(storedKnowledgePoints));
+
+        // 3. 加载用户信息
+        const username = localStorage.getItem("username");
+        if (username) {
+          const userResponse = await fetch(`/api/user/info?username=${username}`);
+          const userData = await userResponse.json();
+
+          if (userData && !userData.error && userData.grade !== undefined) {
+            setUserGrade(userData.grade);
           } else {
             message.error("获取用户信息失败");
           }
-        })
-        .catch((error) => {
-          console.error("获取用户信息出错:", error);
-          message.error("获取用户信息出错");
-        });
-    }
+        }
+      } catch (error) {
+        console.error("加载数据失败:", error);
+        message.error("加载学科数据失败，请刷新页面重试");
+
+        // 使用默认数据作为后备
+        setAllSubjects([
+          {
+            label: "数学",
+            value: "math",
+            chapters: [
+              {
+                label: "基础数学",
+                value: "basic-math",
+                topics: [
+                  { label: "基础运算", value: "basic-operations" }
+                ]
+              }
+            ]
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
+   if (loading) {
+    return (
+      <div style={{ 
+        padding: 20, 
+        textAlign: 'center',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '300px'
+      }}>
+        <Spin size="large" tip="加载学科数据中..." />
+      </div>
+    );
+  }
 
   // 计算掌握度 = (所有得分总和 / (记录数*100)) * 10
   const calculateMastery = (knowledgeName) => {
@@ -134,6 +147,21 @@ const KnowledgeManager = () => {
       const data = await res.json();
       if (data.success) {
         setGeneratedQuestion(data.questions); // 将生成的题目存储到状态
+        //储存到数据库
+
+
+        await fetch("/api/saveQuestions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            questions: data.questions,
+            knowledgeName: knowledge,
+            userGrade,
+            userId: localStorage.getItem("userId"), // 假设用户ID存储在localStorage中
+          }),
+        });
+
+
         message.success({ content: "题目生成成功！", key: "generate" });
         setQuestionModalVisible(true); // 打开新的 Modal
       } else {

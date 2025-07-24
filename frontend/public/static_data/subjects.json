@@ -1,0 +1,600 @@
+[
+  {
+    "label": "数学",
+    "value": "math",
+    "chapters": [
+      {
+        "label": "集合与逻辑",
+        "value": "set-logic",
+        "topics": [
+          { "label": "集合运算", "value": "set-operations" },
+          { "label": "命题与量词", "value": "proposition-quantifier" },
+          { "label": "充分必要条件", "value": "sufficient-necessary" }
+        ]
+      },
+      {
+        "label": "函数",
+        "value": "function",
+        "topics": [
+          { "label": "函数性质", "value": "function-properties" },
+          { "label": "一次/二次函数", "value": "linear-quadratic" },
+          { "label": "指数函数", "value": "exponential" },
+          { "label": "对数函数", "value": "logarithmic" },
+          { "label": "幂函数", "value": "power" },
+          { "label": "复合函数", "value": "composite" }
+        ]
+      },
+      {
+        "label": "三角函数",
+        "value": "trigonometry",
+        "topics": [
+          { "label": "同角公式", "value": "basic-identities" },
+          { "label": "诱导公式", "value": "reduction-formulas" },
+          { "label": "和差倍角公式", "value": "sum-difference" },
+          { "label": "解三角形", "value": "triangle-solving" }
+        ]
+      },
+      {
+        "label": "数列",
+        "value": "sequence",
+        "topics": [
+          { "label": "等差数列", "value": "arithmetic" },
+          { "label": "等比数列", "value": "geometric" },
+          { "label": "递推数列", "value": "recursive" },
+          { "label": "数学归纳法", "value": "induction" }
+        ]
+      },
+      {
+        "label": "不等式",
+        "value": "inequality",
+        "topics": [
+          { "label": "均值不等式", "value": "mean-inequality" },
+          { "label": "线性规划", "value": "linear-programming" },
+          { "label": "绝对值不等式", "value": "absolute-value" }
+        ]
+      },
+      {
+        "label": "立体几何",
+        "value": "solid-geometry",
+        "topics": [
+          { "label": "空间几何体", "value": "spatial-figures" },
+          { "label": "线面关系", "value": "line-plane-relations" },
+          { "label": "空间向量", "value": "space-vector" },
+          { "label": "三视图", "value": "orthographic-projection" }
+        ]
+      },
+      {
+        "label": "解析几何",
+        "value": "analytic-geometry",
+        "topics": [
+          { "label": "直线方程", "value": "line-equations" },
+          { "label": "圆的方程", "value": "circle-equations" },
+          { "label": "椭圆", "value": "ellipse" },
+          { "label": "双曲线", "value": "hyperbola" },
+          { "label": "抛物线", "value": "parabola" }
+        ]
+      },
+      {
+        "label": "概率统计",
+        "value": "probability-statistics",
+        "topics": [
+          { "label": "古典概型", "value": "classical" },
+          { "label": "条件概率", "value": "conditional" },
+          { "label": "随机变量", "value": "random-variables" },
+          { "label": "线性回归", "value": "linear-regression" }
+        ]
+      },
+      {
+        "label": "导数与积分",
+        "value": "calculus",
+        "topics": [
+          { "label": "导数计算", "value": "derivative-calculation" },
+          { "label": "函数单调性", "value": "monotonicity" },
+          { "label": "极值与最值", "value": "extremum" },
+          { "label": "定积分应用", "value": "integral-applications" }
+        ]
+      },
+      {
+        "label": "其他模块",
+        "value": "others",
+        "topics": [
+          { "label": "复数运算", "value": "complex-numbers" },
+          { "label": "算法基础", "value": "algorithms" },
+          { "label": "极坐标", "value": "polar-coordinates" }
+        ]
+      }
+    ]
+  },
+   {
+    "label": "物理",
+    "value": "physics",
+    "chapters": [
+      {
+        "label": "力学基础",
+        "value": "mechanics-basic",
+        "topics": [
+          { "label": "运动学公式", "value": "kinematics-formulas" },
+          { "label": "牛顿三定律", "value": "newton-laws" },
+          { "label": "力的合成与分解", "value": "force-composition" },
+          { "label": "共点力平衡", "value": "force-equilibrium" }
+        ]
+      },
+      {
+        "label": "曲线运动与万有引力",
+        "value": "curved-motion",
+        "topics": [
+          { "label": "平抛运动", "value": "projectile-motion" },
+          { "label": "圆周运动", "value": "circular-motion" },
+          { "label": "万有引力定律", "value": "gravitation-law" },
+          { "label": "卫星环绕速度", "value": "orbital-velocity" }
+        ]
+      },
+      {
+        "label": "功和能量",
+        "value": "work-energy",
+        "topics": [
+          { "label": "功和功率", "value": "work-power" },
+          { "label": "动能定理", "value": "kinetic-energy" },
+          { "label": "机械能守恒", "value": "energy-conservation" },
+          { "label": "功能关系", "value": "work-energy-relation" }
+        ]
+      },
+      {
+        "label": "电场",
+        "value": "electric-field",
+        "topics": [
+          { "label": "库仑定律", "value": "coulombs-law" },
+          { "label": "电场强度", "value": "field-intensity" },
+          { "label": "电势差", "value": "potential-difference" },
+          { "label": "电容器", "value": "capacitor" },
+          { "label": "带电粒子运动", "value": "charged-particle" }
+        ]
+      },
+      {
+        "label": "电路",
+        "value": "circuits",
+        "topics": [
+          { "label": "欧姆定律", "value": "ohms-law" },
+          { "label": "闭合电路分析", "value": "circuit-analysis" },
+          { "label": "电功率计算", "value": "power-calculation" },
+          { "label": "多用电表", "value": "multimeter" }
+        ]
+      },
+      {
+        "label": "磁场与电磁感应",
+        "value": "magnetism-induction",
+        "topics": [
+          { "label": "安培力", "value": "ampere-force" },
+          { "label": "洛伦兹力", "value": "lorentz-force" },
+          { "label": "粒子偏转", "value": "particle-deflection" },
+          { "label": "法拉第定律", "value": "faradays-law" },
+          { "label": "楞次定律", "value": "lenzs-law" }
+        ]
+      },
+      {
+        "label": "热学",
+        "value": "thermodynamics",
+        "topics": [
+          { "label": "分子动理论", "value": "kinetic-theory" },
+          { "label": "理想气体定律", "value": "gas-laws" },
+          { "label": "热力学第一定律", "value": "first-law" },
+          { "label": "能量守恒", "value": "energy-conservation-thermo" }
+        ]
+      },
+      {
+        "label": "振动与波",
+        "value": "oscillation-waves",
+        "topics": [
+          { "label": "简谐运动", "value": "harmonic-motion" },
+          { "label": "单摆周期", "value": "pendulum" },
+          { "label": "机械波", "value": "mechanical-waves" },
+          { "label": "波的干涉", "value": "wave-interference" }
+        ]
+      },
+      {
+        "label": "光学",
+        "value": "optics",
+        "topics": [
+          { "label": "几何光学", "value": "geometric-optics" },
+          { "label": "光的折射", "value": "refraction" },
+          { "label": "透镜成像", "value": "lens-imaging" },
+          { "label": "光的偏振", "value": "polarization" }
+        ]
+      },
+      {
+        "label": "近代物理",
+        "value": "modern-physics",
+        "topics": [
+          { "label": "光电效应", "value": "photoelectric" },
+          { "label": "波粒二象性", "value": "wave-particle" },
+          { "label": "原子结构", "value": "atomic-structure" },
+          { "label": "核反应方程", "value": "nuclear-reactions" }
+        ]
+      }
+    ]
+  },
+  {
+    "label": "化学",
+    "value": "chemistry",
+    "chapters": [
+      {
+        "label": "化学基本概念",
+        "value": "basic-concepts",
+        "topics": [
+          { "label": "物质的分类与性质", "value": "matter-classification" },
+          { "label": "化学计量与阿伏伽德罗定律", "value": "avogadro-law" },
+          { "label": "离子反应与共存", "value": "ion-reactions" },
+          { "label": "氧化还原反应配平", "value": "redox-balancing" }
+        ]
+      },
+      {
+        "label": "物质结构与性质",
+        "value": "structure-properties",
+        "topics": [
+          { "label": "原子结构与电子排布", "value": "atomic-structure" },
+          { "label": "元素周期律与周期表", "value": "periodic-table" },
+          { "label": "化学键与分子极性", "value": "chemical-bonds" },
+          { "label": "晶体类型与晶胞计算", "value": "crystal-types" }
+        ]
+      },
+      {
+        "label": "化学反应原理",
+        "value": "reaction-principles",
+        "topics": [
+          { "label": "化学反应速率与机理", "value": "reaction-kinetics" },
+          { "label": "化学平衡与勒夏特列原理", "value": "chemical-equilibrium" },
+          { "label": "热化学方程式与盖斯定律", "value": "thermochemistry" },
+          { "label": "电化学与原电池", "value": "electrochemistry" }
+        ]
+      },
+      {
+        "label": "溶液与离子平衡",
+        "value": "solution-equilibrium",
+        "topics": [
+          { "label": "电解质溶液与电离平衡", "value": "electrolyte" },
+          { "label": "水的离子积与pH计算", "value": "ph-calculation" },
+          { "label": "盐类水解规律及应用", "value": "salt-hydrolysis" },
+          { "label": "沉淀溶解平衡与Ksp", "value": "solubility-product" }
+        ]
+      },
+      {
+        "label": "元素化合物",
+        "value": "inorganic-compounds",
+        "topics": [
+          { "label": "金属元素（Na/Al/Fe/Cu）", "value": "metals" },
+          { "label": "非金属元素（Cl/S/N/Si）", "value": "non-metals" },
+          { "label": "化合物转化网络", "value": "compound-networks" },
+          { "label": "工业制备原理", "value": "industrial-processes" }
+        ]
+      },
+      {
+        "label": "有机化学基础",
+        "value": "organic-chemistry",
+        "topics": [
+          { "label": "烃类结构与命名", "value": "hydrocarbons" },
+          { "label": "官能团性质与鉴别", "value": "functional-groups" },
+          { "label": "同分异构体与立体化学", "value": "isomerism" },
+          { "label": "有机合成路线设计", "value": "organic-synthesis" }
+        ]
+      },
+      {
+        "label": "化学实验",
+        "value": "chemical-experiments",
+        "topics": [
+          { "label": "仪器操作与安全规范", "value": "apparatus-safety" },
+          { "label": "物质分离与提纯", "value": "separation-purification" },
+          { "label": "定量实验（中和滴定）", "value": "titration" },
+          { "label": "综合探究实验设计", "value": "experiment-design" }
+        ]
+      },
+      {
+        "label": "化学与生活",
+        "value": "chemistry-life",
+        "topics": [
+          { "label": "化学材料（合金/高分子）", "value": "chemical-materials" },
+          { "label": "环境污染与治理", "value": "pollution-control" },
+          { "label": "营养化学与食品安全", "value": "food-chemistry" },
+          { "label": "药物化学基础", "value": "pharmaceutical" }
+        ]
+      }
+    ]
+  },
+    {
+    "label": "生物",
+    "value": "biology",
+    "chapters": [
+      {
+        "label": "分子与细胞基础",
+        "value": "molecular-cell",
+        "topics": [
+          { "label": "细胞学说与生命系统", "value": "cell-theory" },
+          { "label": "生物大分子结构功能", "value": "biomolecules" },
+          { "label": "细胞膜与物质运输", "value": "membrane-transport" },
+          { "label": "细胞器分工协作", "value": "organelles" },
+          { "label": "细胞代谢（酶与ATP）", "value": "cell-metabolism" }
+        ]
+      },
+      {
+        "label": "遗传与变异",
+        "value": "genetics-variation",
+        "topics": [
+          { "label": "遗传定律与基因分离", "value": "mendelian-genetics" },
+          { "label": "DNA结构与复制机制", "value": "dna-replication" },
+          { "label": "基因表达调控", "value": "gene-expression" },
+          { "label": "可遗传变异类型", "value": "mutations" },
+          { "label": "人类遗传病分析", "value": "genetic-diseases" }
+        ]
+      },
+      {
+        "label": "生命活动的调节",
+        "value": "life-regulation",
+        "topics": [
+          { "label": "内环境稳态平衡", "value": "homeostasis" },
+          { "label": "神经调节与反射弧", "value": "neural-regulation" },
+          { "label": "体液调节网络", "value": "hormonal-regulation" },
+          { "label": "免疫系统防御机制", "value": "immune-system" },
+          { "label": "植物激素响应", "value": "plant-hormones" }
+        ]
+      },
+      {
+        "label": "生物与环境",
+        "value": "ecology-environment",
+        "topics": [
+          { "label": "种群特征动态模型", "value": "population-dynamics" },
+          { "label": "群落结构与演替", "value": "community-succession" },
+          { "label": "生态系统能量流动", "value": "energy-flow" },
+          { "label": "物质循环与信息传递", "value": "material-cycle" },
+          { "label": "生物多样性保护", "value": "biodiversity" }
+        ]
+      },
+      {
+        "label": "生物技术与工程",
+        "value": "biotechnology",
+        "topics": [
+          { "label": "基因工程操作流程", "value": "genetic-engineering" },
+          { "label": "PCR技术与DNA分析", "value": "pcr-dna" },
+          { "label": "细胞工程应用", "value": "cell-engineering" },
+          { "label": "胚胎工程伦理", "value": "embryo-engineering" },
+          { "label": "生物制剂与医药", "value": "biopharmaceuticals" }
+        ]
+      },
+      {
+        "label": "实验与探究",
+        "value": "experimental-skills",
+        "topics": [
+          { "label": "显微观察技术", "value": "microscopy" },
+          { "label": "物质鉴定方法", "value": "substance-identification" },
+          { "label": "遗传杂交设计", "value": "genetic-cross" },
+          { "label": "生态调查实践", "value": "ecological-survey" },
+          { "label": "探究实验设计", "value": "experimental-design" }
+        ]
+      }
+    ]
+  },
+  {
+  "label": "政治",
+  "value": "politics",
+  "chapters": [
+    {
+      "label": "中国特色社会主义",
+      "value": "socialism-china",
+      "topics": [
+        { "label": "人类社会发展规律", "value": "social-evolution" },
+        { "label": "社会主义发展历程", "value": "socialism-history" },
+        { "label": "习近平新时代中国特色社会主义思想", "value": "new-era-ideology" },
+        { "label": "中国梦与伟大复兴", "value": "chinese-dream" }
+      ]
+    },
+    {
+      "label": "经济与社会",
+      "value": "economy-society",
+      "topics": [
+        { "label": "社会主义基本经济制度", "value": "basic-economic-system" },
+        { "label": "市场经济体制", "value": "market-economy" },
+        { "label": "新发展理念", "value": "new-development-philosophy" },
+        { "label": "现代化经济体系", "value": "modern-economy" }
+      ]
+    },
+    {
+      "label": "政治与法治",
+      "value": "politics-rule-of-law",
+      "topics": [
+        { "label": "中国共产党的领导", "value": "party-leadership" },
+        { "label": "全过程人民民主", "value": "whole-process-democracy" },
+        { "label": "依法治国方略", "value": "rule-by-law" },
+        { "label": "基层群众自治", "value": "grassroots-autonomy" }
+      ]
+    },
+    {
+      "label": "哲学与文化",
+      "value": "philosophy-culture",
+      "topics": [
+        { "label": "辩证唯物主义", "value": "dialectical-materialism" },
+        { "label": "历史唯物主义", "value": "historical-materialism" },
+        { "label": "中华优秀传统文化", "value": "traditional-culture" },
+        { "label": "文化自信建设", "value": "cultural-confidence" }
+      ]
+    },
+    {
+      "label": "当代国际政治",
+      "value": "international-politics",
+      "topics": [
+        { "label": "国际关系基本准则", "value": "international-norms" },
+        { "label": "人类命运共同体", "value": "community-destiny" },
+        { "label": "中国外交政策", "value": "diplomatic-policy" },
+        { "label": "全球治理体系改革", "value": "global-governance" }
+      ]
+    },
+    {
+      "label": "法律与生活",
+      "value": "law-life",
+      "topics": [
+        { "label": "民事权利与义务", "value": "civil-rights" },
+        { "label": "婚姻家庭法律", "value": "family-law" },
+        { "label": "劳动合同纠纷", "value": "labor-disputes" },
+        { "label": "消费者权益保护", "value": "consumer-protection" }
+      ]
+    },
+    {
+      "label": "逻辑与思维",
+      "value": "logic-thinking",
+      "topics": [
+        { "label": "科学思维方法", "value": "scientific-thinking" },
+        { "label": "辩证思维运用", "value": "dialectical-thinking" },
+        { "label": "创新思维培养", "value": "innovative-thinking" },
+        { "label": "逻辑推理规则", "value": "logical-reasoning" }
+      ]
+    }
+  ]
+},
+{
+  "label": "历史",
+  "value": "history",
+  "chapters": [
+    {
+      "label": "历史学科核心素养体系",
+      "value": "core-literacy",
+      "topics": [
+        { "label": "时空观念（历史事件定位与脉络）", "value": "spatiotemporal" },
+        { "label": "史料实证（文献辨析与考古运用）", "value": "evidence-based" },
+        { "label": "历史解释（多视角分析与因果推理）", "value": "interpretation" },
+        { "label": "唯物史观（社会形态与矛盾分析）", "value": "materialism" },
+        { "label": "家国情怀（文化认同与责任担当）", "value": "national-identity" }
+      ]
+    },
+    {
+      "label": "中国古代史",
+      "value": "ancient-china",
+      "topics": [
+        { "label": "早期国家与青铜文明（夏商周）", "value": "bronze-age" },
+        { "label": "秦汉大一统体制建构", "value": "han-unification" },
+        { "label": "唐宋变革与社会转型", "value": "tang-song-reform" },
+        { "label": "明清帝国危机与近代前夜", "value": "ming-qing-crisis" },
+        { "label": "儒家思想制度化进程", "value": "confucian-system" }
+      ]
+    },
+    {
+      "label": "中国近现代史",
+      "value": "modern-china",
+      "topics": [
+        { "label": "鸦片战争与殖民体系冲击", "value": "opium-war" },
+        { "label": "辛亥革命与帝制终结", "value": "1911-revolution" },
+        { "label": "新民主主义革命道路", "value": "new-democracy" },
+        { "label": "社会主义建设探索（1949-1978）", "value": "socialist-exploration" },
+        { "label": "改革开放与全球化接轨", "value": "reform-opening" }
+      ]
+    },
+    {
+      "label": "世界史",
+      "value": "world-history",
+      "topics": [
+        { "label": "古希腊罗马政治遗产", "value": "greco-roman" },
+        { "label": "宗教改革与近代思想启蒙", "value": "enlightenment" },
+        { "label": "工业革命与资本主义扩张", "value": "industrial-revolution" },
+        { "label": "殖民体系瓦解与民族独立", "value": "decolonization" },
+        { "label": "冷战格局与全球化悖论", "value": "cold-war" }
+      ]
+    },
+    {
+      "label": "历史方法论",
+      "value": "methodology",
+      "topics": [
+        { "label": "一手史料鉴别技术（文献/实物/口述）", "value": "source-verification" },
+        { "label": "历史比较分析法（横向文明对比）", "value": "comparative-analysis" },
+        { "label": "长时段理论（布罗代尔范式）", "value": "longue-duree" },
+        { "label": "计量史学与大数据应用", "value": "quantitative-history" }
+      ]
+    },
+    {
+      "label": "跨学科整合模块",
+      "value": "interdisciplinary",
+      "topics": [
+        { "label": "历史地理学（文明兴衰的地理基础）", "value": "historical-geography" },
+        { "label": "政治制度史（国家治理形态演进）", "value": "political-institutions" },
+        { "label": "经济史视角（生产力与生产关系变革）", "value": "economic-systems" },
+        { "label": "科技文化史（知识传播与社会转型）", "value": "tech-culture" }
+      ]
+    },
+    {
+      "label": "历史实践与探究",
+      "value": "practical-skills",
+      "topics": [
+        { "label": "历史论文写作规范", "value": "academic-writing" },
+        { "label": "考古遗址模拟发掘", "value": "archaeology-sim" },
+        { "label": "口述史采集方法", "value": "oral-history" },
+        { "label": "历史剧创作与展演", "value": "historical-drama" }
+      ]
+    }
+  ]
+},
+{
+  "label": "地理",
+  "value": "geography",
+  "chapters": [
+    {
+      "label": "地理核心素养体系",
+      "value": "core-literacy",
+      "topics": [
+        { "label": "人地协调观（人类活动与自然环境的辩证关系）", "value": "man-land-harmony" },
+        { "label": "综合思维（多要素相互作用与动态分析）", "value": "integrated-thinking" },
+        { "label": "区域认知（空间格局与区域特征解构）", "value": "regional-cognition" },
+        { "label": "地理实践力（野外考察与工具应用能力）", "value": "geographical-practice" }
+      ]
+    },
+    {
+      "label": "自然地理系统",
+      "value": "physical-geography",
+      "topics": [
+        { "label": "地球运动与宇宙环境（昼夜更替/季节变化）", "value": "earth-movement" },
+        { "label": "大气环境（气候形成/天气系统/全球气候变化）", "value": "atmospheric-systems" },
+        { "label": "水文系统（水循环/河流特征/海洋资源）", "value": "hydrological-cycle" },
+        { "label": "地质地貌（板块构造/外力作用/灾害防治）", "value": "geomorphology" },
+        { "label": "生态系统（植被演替/土壤形成/生物多样性）", "value": "ecosystems" }
+      ]
+    },
+    {
+      "label": "人文地理系统",
+      "value": "human-geography",
+      "topics": [
+        { "label": "人口与聚落（人口迁移/城市化问题）", "value": "population-settlement" },
+        { "label": "农业地理（区位理论/现代农业技术）", "value": "agricultural-geography" },
+        { "label": "工业地理（产业集群/产业转型升级）", "value": "industrial-geography" },
+        { "label": "交通与通信（运输方式变革/5G空间影响）", "value": "transportation-communication" },
+        { "label": "文化地理（地域文化/文化扩散）", "value": "cultural-geography" }
+      ]
+    },
+    {
+      "label": "区域可持续发展",
+      "value": "regional-development",
+      "topics": [
+        { "label": "区域特征分析（自然与人文要素整合）", "value": "regional-characteristics" },
+        { "label": "资源开发与国家安全（能源战略/粮食安全）", "value": "resource-security" },
+        { "label": "环境问题与治理（污染防控/生态修复）", "value": "environmental-governance" },
+        { "label": "城乡协调发展（乡村振兴/智慧城市）", "value": "urban-rural-integration" },
+        { "label": "全球化与地方响应（一带一路/RCEP合作）", "value": "globalization-localization" }
+      ]
+    },
+    {
+      "label": "地理技术与实践",
+      "value": "geospatial-technology",
+      "topics": [
+        { "label": "地理信息技术（遥感RS/GIS空间分析）", "value": "geographic-information-system" },
+        { "label": "野外考察方法（土壤采样/植被样方）", "value": "fieldwork-methods" },
+        { "label": "数据可视化（热力图/三维地形建模）", "value": "data-visualization" },
+        { "label": "模拟实验设计（水文过程/城市热岛）", "value": "simulation-experiments" }
+      ]
+    },
+    {
+      "label": "全球视野与国际热点",
+      "value": "global-issues",
+      "topics": [
+        { "label": "极地开发与环境保护（北极航道/南极科考）", "value": "polar-regions" },
+        { "label": "气候治理国际合作（碳交易/绿色金融）", "value": "climate-governance" },
+        { "label": "地缘政治热点（能源冲突/水道争端）", "value": "geopolitical-issues" },
+        { "label": "跨境生态工程（湄公河治理/跨境沙尘防治）", "value": "transboundary-ecology" }
+      ]
+    }
+  ]
+}
+
+]
