@@ -16,10 +16,9 @@
     "react-scripts": "^3.0.1"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
-    "eject": "react-scripts eject"
+    "start": "set NODE_OPTIONS=--openssl-legacy-provider && craco start",
+    "build": "set NODE_OPTIONS=--openssl-legacy-provider && craco build",
+    "test": "set NODE_OPTIONS=--openssl-legacy-provider && craco test"
   },
   "eslintConfig": {
     "extends": [
