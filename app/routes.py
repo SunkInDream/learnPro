@@ -1,8 +1,8 @@
 from flask_cors import CORS
-from app.models.database import db, User, app, LoginList, EatPlace, RestWay,ExerciseQuestion
+from app.models.database import db, User, app, LoginList, EatPlace, RestWay,ExerciseQuestion, FocusTime
 from datetime import datetime, date, timedelta
 from flask_sqlalchemy import SQLAlchemy
-from app.models.LLM import main as llm_query
+from app.models.LLM import generatequestion as llm_query
 from flask import Flask, jsonify, request, send_file, make_response, send_from_directory
 from docx import Document
 from werkzeug.utils import secure_filename
@@ -57,8 +57,9 @@ def display_user_info():
             'bio': user.bio,
             'avatar': user.avatar,
             'studyDays': study_days,
-            'focusTime': user.focusTime,
-            'lastLoginTime': user.lastLoginTime
+            'lastLoginTime': user.lastLoginTime,
+            'subject_categories': user.subject_categories,
+            'subject_chosen': user.subject_chosen,
         }, 200  
 
 
@@ -84,6 +85,30 @@ def punch():
         db.session.commit()
     return {'success': True}, 200
 
+@app.route('/api/postfocustime', methods=['POST'])
+def post_focus_time():
+    data = request.get_json()
+    username = data.get('username')
+    focus_time = data.get('focus_time')
+    date_str = data.get('date')
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return {'error': 'User not found'}, 404
+
+    if not date_str:
+        date_str = datetime.now().strftime('%Y-%m-%d')
+
+    existing_focus = FocusTime.query.filter_by(user_id=user.id).first()
+    if existing_focus:
+        existing_focus.focus_time = focus_time
+        existing_focus.date = date_str
+    else:
+        new_focus = FocusTime(user_id=user.id, focus_time=focus_time, date=date_str)
+        db.session.add(new_focus)
+
+    db.session.commit()
+    return {'success': True}, 200
 
 @app.route('/api/addeatplace', methods=['POST'])
 def add_eat_place():
@@ -129,10 +154,8 @@ def update_user_info():
         user.birthday = data.get('birthday')
         user.targetSchool = data.get('targetSchool')
         user.bio = data.get('bio')
-
-        # user.avatar = data.get('avatar')
-        # user.focusTime = data.get('focusTime')
-        # user.lastLoginTime = data.get('lastLoginTime')
+        user.subject_categories = data.get('subject_categories', '[]')
+        user.subject_chosen = data.get('subject_chosen', '[]')
 
         db.session.commit()
         return {'success': True}, 200
@@ -173,7 +196,7 @@ def upload_image():
 
 
 @app.route('/api/chat', methods=['POST'])
-def chat():
+def chat(): 
     data = request.get_json()
     question = data.get('question')
     
@@ -228,7 +251,7 @@ def generate_questions():
         return jsonify({"success": False, "msg": "参数缺失"}), 400
 
     try:
-        response = LLM.main(subject=subject, difficulty=difficulty, grade=grade, knowledge=knowledge)
+        response = LLM.generatetimetable(subject=subject, difficulty=difficulty, grade=grade, knowledge=knowledge)
         print("LLM response:", response)
 
         # 直接取result字段，它是字符串
@@ -247,6 +270,23 @@ def generate_questions():
         print("Error:", e)
         return jsonify({"success": False, "msg": "生成失败"}), 500
     
+
+@app.route('/api/generatetimetable',methods=['POST'])
+def generatetimetable():
+    data = request.json
+    starttime = data.get("starttime")
+    endtime = data.get("endtime")
+    subjects = data.get("subjects", [])
+    if not starttime or not endtime:
+        return jsonify({"success": False, "msg": "参数缺失"}), 400
+
+    try:
+        timetable = LLM.generatetimetable(starttime=starttime, endtime=endtime, subjects=subjects)
+        return jsonify({"success": True, "timetable": timetable}), 200
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"success": False, "msg": "生成失败"}), 500
+
 @app.route('/api/saveQuestions', methods=['POST'])
 def save_questions():
     data = request.json

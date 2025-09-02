@@ -7,6 +7,7 @@ import Feedback from './pages/Feedback';
 import StudyPlan from './pages/StudyPlan';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Todolist from './pages/Todolist';
 import 'antd/dist/reset.css';
 
 // 私有路由守卫 - 需要登录才能访问
@@ -37,7 +38,6 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* ===== 公共路由（未登录用户可访问）===== */}
         <Route 
           path="/login" 
           element={
@@ -54,9 +54,6 @@ function App() {
             </PublicRoute>
           } 
         />
-        
-        {/* ===== 私有路由（需要登录才能访问）===== */}
-        {/* 首页 */}
         <Route 
           path="/" 
           element={
@@ -66,7 +63,6 @@ function App() {
           } 
         />
         
-        {/* 主页面（如果Main和Home是不同页面的话） */}
         <Route 
           path="/home" 
           element={
@@ -76,7 +72,6 @@ function App() {
           }
         />
         
-        {/* 用户中心 */}
         <Route 
           path="/user" 
           element={
@@ -86,7 +81,6 @@ function App() {
           } 
         />
         
-        {/* 反馈页面 */}
         <Route 
           path="/feedback" 
           element={
@@ -95,8 +89,7 @@ function App() {
             </PrivateRoute>
           } 
         />
-        
-        {/* 学习计划 */}
+
         <Route 
           path="/study-plan" 
           element={
@@ -105,8 +98,14 @@ function App() {
             </PrivateRoute>
           } 
         />
-        
-        {/* ===== 404和兜底路由 ===== */}
+        <Route
+          path="/todolist" 
+          element={
+            <PrivateRoute>
+              <Todolist />
+            </PrivateRoute>
+          }
+        />
         <Route 
           path="*" 
           element={

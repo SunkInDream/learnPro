@@ -61,13 +61,6 @@ const UserCenter = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.clear();  
-
-    message.success('退出登录成功');
-    navigate('/login', { replace: true });
-  };
-
   return (
     <Layout className="user-center">
       <Head />

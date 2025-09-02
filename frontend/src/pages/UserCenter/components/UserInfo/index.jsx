@@ -45,9 +45,24 @@ const UserInfo = (props) => {
         const response = await request.get(`/api/user/info?username=${username}`);
         
         if (response.data) {
+          console.log('获取用户信息:', response.data);
           const data = response.data;
           setUserInfo(data);
           setImageUrl(data.avatar);
+          
+          let subjectChosenArray = [];
+          if (data.subject_chosen) {
+            try {
+              if (typeof data.subject_chosen === 'string') {
+                subjectChosenArray = JSON.parse(data.subject_chosen);
+              } else if (Array.isArray(data.subject_chosen)) {
+                subjectChosenArray = data.subject_chosen;
+              }
+            } catch (error) {
+              console.error('解析 subject_chosen 失败:', error);
+              subjectChosenArray = [];
+            }
+          }
           
           form.setFieldsValue({
             nickname: data.nickname || '',
@@ -56,13 +71,13 @@ const UserInfo = (props) => {
             email: data.email || '',
             birthday: data.birthday ? moment(data.birthday) : null,
             targetSchool: data.targetSchool || '',
-            category: data.category || '',      // 添加类别
-            subjects: data.subjects || [],      // 科目数组
+            category: data.subject_categories || '', 
+            subjects: subjectChosenArray, 
             bio: data.bio || ''
           });
           
-          if (data.category && subjectConfig[data.category]) {
-            setSubjectOptions(subjectConfig[data.category]);
+          if (data.subject_categories && subjectConfig[data.subject_categories]) {
+            setSubjectOptions(subjectConfig[data.subject_categories]);
           }
         }
       } catch (error) {
@@ -129,11 +144,13 @@ const UserInfo = (props) => {
         email: values.email,
         birthday: values.birthday ? values.birthday.format('YYYY-MM-DD') : null,
         targetSchool: values.targetSchool,
-        category: values.category,
-        subjects: values.subjects,
+        subject_categories: values.category,
+        subject_chosen: JSON.stringify(values.subjects || []),
         bio: values.bio,
         avatar: imageUrl
       };
+      localStorage.removeItem('userSubjectsCache');
+      localStorage.setItem('forceRefreshSubjects', 'true');
 
       console.log('提交的数据:', updatedUserInfo);
 

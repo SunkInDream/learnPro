@@ -21,18 +21,6 @@ const Home = () => {
   const [typedContent, setTypedContent] = useState('');
 
   useEffect(() => {
-    const username = localStorage.getItem('username');
-    
-    if (username) {
-      fetch('/api/punch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username })
-      });
-    }
-  }, []);
-
-  useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
@@ -92,20 +80,7 @@ const Home = () => {
     }
   };
 
-  const handleGeneratePlan = async () => {
-    try {
-      const values = await form.validateFields();
-      const timeRange = {
-        start: values.timeRange[0].format('HH:mm'),
-        end: values.timeRange[1].format('HH:mm')
-      };
 
-      message.success('学习计划生成成功！即将跳转到学习计划页面...');
-      setTimeout(() => navigate('/study-plan'), 1500);
-    } catch (error) {
-      message.error('请填写完整的时间段信息');
-    }
-  };
 
   return (
     <Layout className="home-layout">
@@ -183,39 +158,7 @@ const Home = () => {
           </div>
         </Card>
 
-        <Card title="学习计划生成" className="plan-card">
-          <Form
-            form={form}
-            initialValues={{
-              timeRange: [moment('07:00', 'HH:mm'), moment('21:00', 'HH:mm')]
-            }}
-          >
-            <Form.Item
-              name="timeRange"
-              label="空闲时间段"
-              rules={[{ required: true, message: '请选择时间段' }]}
-            >
-              <TimePicker.RangePicker
-                format="HH:mm"
-                placeholder={['开始时间', '结束时间']}
-              />
-            </Form.Item>
-            <div className='button-container' style={{
-              margin: '20px 0',
-              display: 'flex',
-              justifyContent: 'flex-end'
-            }}>
-              <Button
-                type="primary"
-                icon={<CalendarOutlined />}
-                onClick={handleGeneratePlan}
-                style={{ marginRight: '10px' }}
-              >
-                生成学习计划
-              </Button>
-            </div>
-          </Form>
-        </Card>
+
       </Content>
     </Layout>
   );

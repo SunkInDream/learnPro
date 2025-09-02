@@ -77,6 +77,7 @@ export default function Main() {
                     <TrophyOutlined />
                   </div>
                 }
+                
               >
                 <Card.Meta
                   title="?????"

@@ -9,7 +9,7 @@ def clean_question_text(text):
     text = text.replace("\\times", "×").replace("\\div", "÷").replace("\\pm", "±").replace("\\cdot", "·")
     return text
 
-def main(user_question="hello", subject=None, grade=None, knowledge=None, difficulty=None):
+def generatequestion(user_question="hello", subject=None, grade=None, knowledge=None, difficulty=None):
     url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie-4.0-8k-latest?access_token=" + get_access_token()
 
     difficulty_level = "中等"
@@ -55,6 +55,28 @@ def main(user_question="hello", subject=None, grade=None, knowledge=None, diffic
     res_json["result"] = questions_clean
 
     return res_json
+
+
+def generatetimetable(starttime, endtime, subjects):
+    url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie-4.0-8k-latest?access_token=" + get_access_token()
+    prompt = f"""
+    请为我生成从{starttime}到{endtime}的学习计划，科目包括：{', '.join(subjects)}
+    结果只包含key,timeslot,content,difficulty,exercises.score,type这些字段
+    """
+    payload = json.dumps({
+        "messages": [
+            {"role": "user", "content": prompt}
+        ]
+    }, ensure_ascii=False)
+
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(url, headers=headers, data=payload.encode("utf-8"))
+
+    res_json = response.json()
+    return res_json
+
+def main(user_question="hello", subject=None, grade=None, knowledge=None, difficulty=None):
+    return generatequestion(user_question, subject, grade, knowledge, difficulty)
 
 def get_access_token():
     url = "https://aip.baidubce.com/oauth/2.0/token"

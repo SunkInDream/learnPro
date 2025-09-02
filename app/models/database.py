@@ -16,12 +16,14 @@ class User(db.Model):
     grade = db.Column(db.String(120))
     birthday = db.Column(db.String(120))
     targetSchool = db.Column(db.String(120))
+    subject_categories = db.Column(db.String(120), default='[]') 
+    subject_chosen = db.Column(db.String(120), default='[]')
     bio = db.Column(db.String(1200))
     avatar = db.Column(db.String(120))
     studyDays = db.Column(db.Integer, default=0)
-    focusTime = db.Column(db.Integer, default=0)
     lastLoginTime = db.Column(db.DateTime, default=datetime.utcnow)
     login_list = db.relationship('LoginList', backref='user', lazy=True)
+    focus_time = db.relationship('FocusTime', backref='user', lazy=True)
     restway = db.relationship('RestWay', backref='user', lazy=True)
     eatplace = db.relationship('EatPlace', backref='user', lazy=True)
     knowledge_progresses = db.relationship('UserKnowledgeProgress', backref='user', lazy=True)
@@ -51,28 +53,17 @@ class User(db.Model):
     
     from datetime import datetime
 
-class KnowledgePoint(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
-    subject = db.Column(db.String(100), nullable=False)  
-
-
 class ExerciseRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    knowledge_point_id = db.Column(db.Integer, db.ForeignKey('knowledge_point.id'), nullable=False)
     difficulty = db.Column(db.Integer) 
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class UserKnowledgeProgress(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    knowledge_point_id = db.Column(db.Integer, db.ForeignKey('knowledge_point.id'), nullable=False)
-    mastery_level = db.Column(db.Float, default=0.0)  # 掌握程度 0-100
+    mastery_level = db.Column(db.Float, default=0.0)
     last_practiced = db.Column(db.DateTime)
-    
-    # 确保用户和知识点组合的唯一性
-    __table_args__ = (db.UniqueConstraint('user_id', 'knowledge_point_id'),)
 
 class RestWay(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -89,28 +80,17 @@ class LoginList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     login_time = db.Column(db.DateTime)
-    login_date = db.Column(db.Date)  # 新增字段
+    login_date = db.Column(db.Date)
     ip_address = db.Column(db.String(64))
     __table_args__ = (
         db.UniqueConstraint('user_id', 'login_date', name='unique_user_date'),
     )
-
-class Subject(db.Model):
+class FocusTime(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    chapter = db.relationship('Chapter', backref='subject', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    focus_time = db.Column(db.Integer, nullable=False)
+    date = db.Column(db.Date, nullable=False)
 
-class Chapter(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
-    topic = db.relationship('Topic', backref='chapter', lazy=True)
-
-class Topic(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), nullable=False)
-    
 class ExerciseQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
