@@ -75,6 +75,20 @@ def generatetimetable(starttime, endtime, subjects):
     res_json = response.json()
     return res_json
 
+
+def chat(message):
+    url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie-4.0-8k-latest?access_token=" + get_access_token()
+    payload = json.dumps({
+        "messages":[{"role": "user", "content": message}]
+    }, ensure_ascii=False)
+
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(url, headers=headers, data=payload.encode("utf-8"))
+
+    res_json = response.json()
+    return res_json
+
+
 def main(user_question="hello", subject=None, grade=None, knowledge=None, difficulty=None):
     return generatequestion(user_question, subject, grade, knowledge, difficulty)
 

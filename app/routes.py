@@ -2,7 +2,6 @@ from flask_cors import CORS
 from app.models.database import db, User, app, LoginList, EatPlace, RestWay,ExerciseQuestion, FocusTime
 from datetime import datetime, date, timedelta
 from flask_sqlalchemy import SQLAlchemy
-from app.models.LLM import generatequestion as llm_query
 from flask import Flask, jsonify, request, send_file, make_response, send_from_directory
 from docx import Document
 from werkzeug.utils import secure_filename
@@ -208,12 +207,11 @@ def chat():
         print(f"收到问题: {question}")
         
         # 调用LLM模型获取回答
-        response = llm_query(question)
+        response = LLM.chat(question)
         
         # 调试输出
         print(f"API返回: {response}")
         
-        # 检查各种可能的响应格式
         if isinstance(response, dict):
             if 'result' in response:
                 ai_answer = response['result']
@@ -224,7 +222,6 @@ def chat():
             elif 'message' in response and isinstance(response['message'], dict) and 'content' in response['message']:
                 ai_answer = response['message']['content']
             else:
-                # 如果找不到预期字段，尝试寻找其他可能的响应字段
                 print(f"无法找到标准响应字段，响应键: {response.keys()}")
                 ai_answer = str(response)
         else:

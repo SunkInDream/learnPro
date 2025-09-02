@@ -213,7 +213,6 @@ const StudyPlan = () => {
           
           console.log('格式化后的数据:', formattedPlan);
           
-          // 更新表格数据
           setPlanData(formattedPlan);
           
           message.success('学习计划生成成功！');
