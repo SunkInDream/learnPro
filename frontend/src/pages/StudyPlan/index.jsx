@@ -10,21 +10,7 @@ const { Header, Content } = Layout;
 const { Option } = Select;
 
 const StudyPlan = () => {
-  const [planData, setPlanData] = useState([
-  //   { key: '1', timeSlot: '07:00-07:30', content: '早饭', type: 'break' },
-  //   { key: '2', timeSlot: '07:30-09:00', content: '数学 - 函数与导数', difficulty: 7, exercises: 'math_1.pdf', score: '85/100', type: 'study' },
-  //   { key: '3', timeSlot: '09:00-09:30', content: '休息 - 散步', type: 'break' },
-  //   { key: '4', timeSlot: '09:30-11:00', content: '物理 - 力学', difficulty: 6, exercises: 'physics_1.pdf', score: '90/100', type: 'study' },
-  //   { key: '5', timeSlot: '11:30-12:30', content: '午饭', type: 'break' },
-  //   { key: '6', timeSlot: '12:30-14:00', content: '化学 - 化学平衡', difficulty: 8, exercises: 'chemistry_1.pdf', score: '88/100', type: 'study' },
-  //   { key: '7', timeSlot: '14:00-14:30', content: '休息 - 小憩', type: 'break' },
-  //   { key: '8', timeSlot: '14:30-16:00', content: '英语 - 阅读理解', difficulty: 5, exercises: 'english_1.pdf', score: '92/100', type: 'study' },
-  //   { key: '9', timeSlot: '17:00-17:30', content: '晚饭', type: 'break' },
-  //   { key: '10', timeSlot: '17:30-19:00', content: '语文 - 文言文', difficulty: 6, exercises: 'chinese_1.pdf', score: '87/100', type: 'study' },
-  //   { key: '11', timeSlot: '19:00-19:30', content: '休息 - 运动', type: 'break' },
-  //   { key: '12', timeSlot: '19:30-21:00', content: '生物 - 遗传', difficulty: 7, exercises: 'biology_1.pdf', score: '89/100', type: 'study' }
-  ]);
-
+  const [planData, setPlanData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingKey, setEditingKey] = useState('');
   const [form] = Form.useForm();
@@ -461,7 +447,7 @@ const StudyPlan = () => {
       >
         <Progress percent={Math.floor(generatePercent)} status={generatePercent < 100 ? 'active' : 'success'} />
         <div style={{ marginTop: '16px', textAlign: 'center', color: '#666' }}>
-          AI正在为您制定个性化学习计划...
+          正在为您制定个性化学习计划...
         </div>
       </Modal>
     </>

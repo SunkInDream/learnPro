@@ -316,7 +316,7 @@ def generate_exam():
     difficulty = request.args.get('difficulty', '5')
     
     try:
-        llm_response = llm_query(user_question="", subject=subject, difficulty=difficulty)
+        llm_response = LLM.generatequestion(user_question="", subject=subject, difficulty=difficulty)
         if isinstance(llm_response, dict) and 'result' in llm_response:
             response_text = llm_response['result']
             questions = [line.strip() for line in response_text.split('\n')
