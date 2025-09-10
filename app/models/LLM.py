@@ -57,11 +57,13 @@ def generatequestion(user_question="hello", subject=None, grade=None, knowledge=
     return res_json
 
 
-def generatetimetable(starttime, endtime, subjects):
+def generatetimetable(starttime, endtime, subjects, restMethods=None, knowledgeMastery=None, studyHistory=None):
     url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie-4.0-8k-latest?access_token=" + get_access_token()
     prompt = f"""
-    请为我生成从{starttime}到{endtime}的学习计划，科目包括：{', '.join(subjects)}
-    结果只包含key,timeslot,content,difficulty,exercises.score,type这些字段
+    请为我生成从{starttime}到{endtime}的学习计划，科目包括：{', '.join(subjects)},休息方式包括：{', '.join(restMethods) if restMethods else '无特别要求'}
+    我的知识掌握情况是：{json.dumps(knowledgeMastery) if knowledgeMastery else '无特别说明'}
+    我的学习历史是：{json.dumps(studyHistory) if studyHistory else '无特别说明'}
+    结果只包含key,timeslot,content,difficulty,exercises.score,type这些字段,特别注意difficulty字段是整数必须在1到10之间。
     """
     payload = json.dumps({
         "messages": [

@@ -26,7 +26,6 @@ export default function Head() {
         <Menu mode="horizontal" >
           <Menu.Item key="home" onClick={() => navigate('/Home')}>AI助手</Menu.Item>
           <Menu.Item key="plan" onClick={() => navigate('/study-plan')}>学习计划</Menu.Item>
-          <Menu.Item key="todolist" onClick={() => navigate('/todolist')}>待办事项</Menu.Item>
           <Menu.Item key="feedback" onClick={() => navigate('/feedback')}>反馈</Menu.Item>
           <Menu.Item key="user" onClick={() => navigate('/user')}>个人中心</Menu.Item>
         </Menu>

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Head from '../Head';
-import { Layout, Menu, Table, Button, Modal, Form, Input, Select, TimePicker, InputNumber, Space, message, Progress, Card } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, CalendarOutlined } from '@ant-design/icons';
+import { Layout, Menu, Table, Button, Modal, Form, Input, Select, TimePicker, InputNumber, Space, message, Progress, Card, Alert, Popover, List, Tag } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, CalendarOutlined, HistoryOutlined, ClearOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import './index.less';
@@ -10,7 +10,10 @@ const { Header, Content } = Layout;
 const { Option } = Select;
 
 const StudyPlan = () => {
-  const [planData, setPlanData] = useState([]);
+  const [planData, setPlanData] = useState(() => {
+    const savedPlan = localStorage.getItem('currentStudyPlan');
+    return savedPlan ? JSON.parse(savedPlan) : [];
+  });
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingKey, setEditingKey] = useState('');
   const [form] = Form.useForm();
@@ -21,8 +24,77 @@ const StudyPlan = () => {
   const [generating, setGenerating] = useState(false);
   const [generatePercent, setGeneratePercent] = useState(0);
   const generateTimerRef = useRef(null);
+  const [personalizedData, setPersonalizedData] = useState({
+    restMethods: [],
+    knowledgePoints: [],
+    studyHistory: []
+  });
+  const [planHistory, setPlanHistory] = useState(() => {
+    const savedHistory = localStorage.getItem('studyPlanHistory');
+    return savedHistory ? JSON.parse(savedHistory) : [];
+  });
+  const [formValues, setFormValues] = useState(() => {
+    const saved = localStorage.getItem('studyPlanFormValues');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return {
+          timeRange: parsed.timeRange && parsed.timeRange.length === 2 ? [
+            moment(parsed.timeRange[0], 'HH:mm'), 
+            moment(parsed.timeRange[1], 'HH:mm')
+          ] : [moment('07:00', 'HH:mm'), moment('21:00', 'HH:mm')],
+          subjects: parsed.subjects || []
+        };
+      } catch (error) {
+        console.log('解析保存的表单数据失败:', error);
+      }
+    }
+    return {
+      timeRange: [moment('07:00', 'HH:mm'), moment('21:00', 'HH:mm')],
+      subjects: []
+    };
+  });
 
-  // 组件卸载时清理定时器
+  useEffect(() => {
+    localStorage.setItem('currentStudyPlan', JSON.stringify(planData));
+  }, [planData]);
+
+  useEffect(() => {
+    localStorage.setItem('studyPlanHistory', JSON.stringify(planHistory));
+  }, [planHistory]);
+
+  useEffect(() => {
+    if (formValues && formValues.timeRange && formValues.timeRange.length === 2) {
+      const saveData = {
+        timeRange: [
+          formValues.timeRange[0].format('HH:mm'),
+          formValues.timeRange[1].format('HH:mm')
+        ],
+        subjects: formValues.subjects || []
+      };
+      localStorage.setItem('studyPlanFormValues', JSON.stringify(saveData));
+    }
+  }, [formValues]);
+
+  useEffect(() => {
+    const restPlaces = JSON.parse(localStorage.getItem('restPlaces') || '[]');
+    const knowledgePoints = JSON.parse(localStorage.getItem('knowledgePoints') || '[]');
+    const records = JSON.parse(localStorage.getItem('records') || '[]');
+    
+    setPersonalizedData({
+      restMethods: restPlaces.map(place => place.content),
+      knowledgePoints: knowledgePoints.length,
+      studyHistory: records.length
+    });
+
+    if (formValues.subjects && formValues.subjects.length > 0) {
+      form.setFieldsValue({
+        timeRange: [moment('07:00', 'HH:mm'), moment('21:00', 'HH:mm')],
+        subjects: formValues.subjects
+      });
+    }
+  }, []);
+
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -35,10 +107,8 @@ const StudyPlan = () => {
   }, []);
 
   const generateAndDownloadExam = (subject, difficulty) => {
-    // 打开进度条 Modal
     setDownloading(true);
     setPercent(0);
-    // 模拟进度增长
     timerRef.current = window.setInterval(() => {
       setPercent(p => Math.min(p + Math.random() * 5, 95));
     }, 500);
@@ -154,6 +224,33 @@ const StudyPlan = () => {
       generateTimerRef.current = window.setInterval(() => {
         setGeneratePercent(p => Math.min(p + Math.random() * 3, 90));
       }, 300);
+
+      const restPlaces = JSON.parse(localStorage.getItem('restPlaces') || '[]');
+      const restMethods = restPlaces.map(place => place.content);
+
+      const knowledgePoints = JSON.parse(localStorage.getItem('knowledgePoints') || '[]');
+      const knowledgeMastery = knowledgePoints.map(point => ({
+        subject: point.subject,
+        chapter: point.chapter,
+        topic: point.topic,
+        masteryLevel: point.masteryLevel || 0, 
+        lastStudyTime: point.lastStudyTime || null
+      }));
+
+      const records = JSON.parse(localStorage.getItem('records') || '[]');
+      const studyHistory = records.map(record => ({
+        subject: record.subject,
+        topic: record.topic,
+        score: record.score,
+        studyTime: record.studyTime,
+        date: record.date
+      }));
+
+      console.log('发送给后端数据:', {
+        restMethods: restMethods,
+        knowledgeMastery: knowledgeMastery,
+        studyHistory: studyHistory
+      });
       
       const response = await fetch('/api/generatetimetable', {
         method: 'POST',
@@ -163,7 +260,10 @@ const StudyPlan = () => {
         body: JSON.stringify({
           starttime: timeRange.start,
           endtime: timeRange.end,
-          subjects: values.subjects
+          subjects: values.subjects,
+          restMethods: restMethods, 
+          knowledgeMastery: knowledgeMastery,
+          studyHistory: studyHistory 
         })
       });
       
@@ -188,16 +288,26 @@ const StudyPlan = () => {
             key: item.key,
             timeSlot: item.timeslot,
             content: item.content,
-            difficulty: item.difficulty === '简单' ? 3 : 
-                       item.difficulty === '中等' ? 5 : 
-                       item.difficulty === '困难' ? 8 : 
-                       item.difficulty === '自定义' ? 5 : item.difficulty,
+            difficulty: item.difficulty,
             exercises: `${item.content.split('：')[0]}_练习.pdf`,
             score: item.exercises_score ? `${item.exercises_score}/100` : '',
             type: item.type === '休息' ? 'break' : 'study'
           }));
           
           console.log('格式化后的数据:', formattedPlan);
+          
+          if (planData.length > 0) {
+            const currentPlanRecord = {
+              id: Date.now(),
+              name: `学习计划 - ${new Date().toLocaleDateString()}`,
+              createTime: new Date().toISOString(),
+              planData: [...planData],
+              subjects: values.subjects,
+              timeRange: timeRange
+            };
+            
+            setPlanHistory(prev => [currentPlanRecord, ...prev.slice(0, 9)]); 
+          }
           
           setPlanData(formattedPlan);
           
@@ -277,6 +387,73 @@ const StudyPlan = () => {
     }
   };
 
+  // 清空当前计划
+  const handleClearPlan = () => {
+    Modal.confirm({
+      title: '确认清空',
+      content: '确定要清空当前学习计划吗？此操作不可恢复。',
+      onOk: () => {
+        setPlanData([]);
+        message.success('已清空当前学习计划');
+      }
+    });
+  };
+
+  // 加载历史计划
+  const handleLoadHistoryPlan = (historyPlan) => {
+    Modal.confirm({
+      title: '加载历史计划',
+      content: `确定要加载"${historyPlan.name}"吗？当前计划将被替换。`,
+      onOk: () => {
+        setPlanData(historyPlan.planData);
+        message.success('历史计划加载成功');
+      }
+    });
+  };
+
+  // 删除历史计划
+  const handleDeleteHistoryPlan = (planId) => {
+    setPlanHistory(prev => prev.filter(plan => plan.id !== planId));
+    message.success('历史计划删除成功');
+  };
+
+  // 历史计划列表组件
+  const HistoryPlanList = () => (
+    <div style={{ width: 300 }}>
+      <List
+        header={<div>历史计划记录</div>}
+        dataSource={planHistory}
+        renderItem={item => (
+          <List.Item
+            actions={[
+              <Button type="link" size="small" onClick={() => handleLoadHistoryPlan(item)}>
+                加载
+              </Button>,
+              <Button type="link" size="small" danger onClick={() => handleDeleteHistoryPlan(item.id)}>
+                删除
+              </Button>
+            ]}
+          >
+            <List.Item.Meta
+              title={item.name}
+              description={
+                <div>
+                  <div>{new Date(item.createTime).toLocaleString()}</div>
+                  <div>
+                    {item.subjects?.map(subject => (
+                      <Tag key={subject} size="small">{subject}</Tag>
+                    ))}
+                  </div>
+                </div>
+              }
+            />
+          </List.Item>
+        )}
+        locale={{ emptyText: '暂无历史计划' }}
+      />
+    </div>
+  );
+
   return (
     <>
       <Layout className="study-plan-layout">
@@ -288,7 +465,12 @@ const StudyPlan = () => {
               form={form}
               initialValues={{
                 timeRange: [moment('07:00', 'HH:mm'), moment('21:00', 'HH:mm')],
-                subjects: ['数学', '物理', '化学']
+                subjects: formValues.subjects || []
+              }}
+              onValuesChange={(_, allValues) => {
+                if (allValues.timeRange && allValues.timeRange.length === 2) {
+                  setFormValues(allValues);
+                }
               }}
             >
               <Form.Item
@@ -334,7 +516,6 @@ const StudyPlan = () => {
                   onClick={handleGeneratePlan}
                   loading={generating}
                   disabled={generating}
-                  style={{ marginRight: '10px' }}
                 >
                   {generating ? '正在生成...' : '生成学习计划'}
                 </Button>
@@ -343,9 +524,28 @@ const StudyPlan = () => {
           </Card>
           <div className="plan-header">
             <h2>学习计划表</h2>
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-              添加计划
-            </Button>
+            <Space>
+              <Popover 
+                content={<HistoryPlanList />} 
+                title="历史计划" 
+                trigger="click"
+                placement="bottomRight"
+              >
+                <Button icon={<HistoryOutlined />}>
+                  历史计划 ({planHistory.length})
+                </Button>
+              </Popover>
+              <Button 
+                icon={<ClearOutlined />} 
+                onClick={handleClearPlan}
+                disabled={planData.length === 0}
+              >
+                清空计划
+              </Button>
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+                添加计划
+              </Button>
+            </Space>
           </div>
 
           <Table
@@ -354,6 +554,7 @@ const StudyPlan = () => {
             pagination={false}
             className="plan-table"
           />
+
 
           <Modal
             title={editingKey ? "编辑计划" : "添加计划"}

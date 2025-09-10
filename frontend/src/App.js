@@ -7,7 +7,6 @@ import Feedback from './pages/Feedback';
 import StudyPlan from './pages/StudyPlan';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Todolist from './pages/Todolist';
 import 'antd/dist/reset.css';
 
 // 私有路由守卫 - 需要登录才能访问
@@ -97,14 +96,6 @@ function App() {
               <StudyPlan />
             </PrivateRoute>
           } 
-        />
-        <Route
-          path="/todolist" 
-          element={
-            <PrivateRoute>
-              <Todolist />
-            </PrivateRoute>
-          }
         />
         <Route 
           path="*" 

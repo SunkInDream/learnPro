@@ -274,11 +274,14 @@ def generatetimetable():
     starttime = data.get("starttime")
     endtime = data.get("endtime")
     subjects = data.get("subjects", [])
+    restMethods = data.get("restMethods", [])
+    knowledgeMastery = data.get("knowledgeMastery", {})
+    studyHistory = data.get("studyHistory", {})
     if not starttime or not endtime:
         return jsonify({"success": False, "msg": "参数缺失"}), 400
 
     try:
-        timetable = LLM.generatetimetable(starttime=starttime, endtime=endtime, subjects=subjects)
+        timetable = LLM.generatetimetable(starttime=starttime, endtime=endtime, subjects=subjects, restMethods=restMethods, knowledgeMastery=knowledgeMastery, studyHistory=studyHistory)
         return jsonify({"success": True, "timetable": timetable}), 200
     except Exception as e:
         print("Error:", e)
@@ -300,7 +303,7 @@ def save_questions():
             user_id=user_id,
             questions=questions,
             answer="",
-            difficulty=5  # 默认难度
+            difficulty=5  
         )
         db.session.add(exercise_question)
         db.session.commit()
