@@ -194,46 +194,37 @@ def upload_image():
 
 
 
+
 @app.route('/api/chat', methods=['POST'])
-def chat(): 
-    data = request.get_json()
+def chat_api():
+    data = request.get_json() or {}
     question = data.get('question')
-    
     if not question:
-        return {'error': '请输入问题'}, 400
-    
+        return jsonify({'error': '请输入问题'}), 400
+
     try:
-        # 打印调试信息
-        print(f"收到问题: {question}")
-        
-        # 调用LLM模型获取回答
-        response = LLM.chat(question)
-        
-        # 调试输出
-        print(f"API返回: {response}")
-        
-        if isinstance(response, dict):
-            if 'result' in response:
-                ai_answer = response['result']
-            elif 'response' in response:
-                ai_answer = response['response']
-            elif 'content' in response:
-                ai_answer = response['content']
-            elif 'message' in response and isinstance(response['message'], dict) and 'content' in response['message']:
-                ai_answer = response['message']['content']
-            else:
-                print(f"无法找到标准响应字段，响应键: {response.keys()}")
-                ai_answer = str(response)
-        else:
-            ai_answer = '抱歉，服务器返回了意外格式的数据'
-            print(f"意外的响应类型: {type(response)}")
-        
-        return {'answer': ai_answer}, 200
+        print(f"[API] /api/chat 收到: {question}")
+        resp = LLM.chat(question)           # 确保 app.models.LLM 里真的有 chat
+        print(f"[API] LLM 返回: {repr(resp)}")
+
+        ai_answer = None
+        if isinstance(resp, dict):
+            ai_answer = (
+                resp.get('result')
+                or resp.get('response')
+                or resp.get('content')
+                or (resp.get('message') or {}).get('content')
+            )
+        if ai_answer is None:
+            ai_answer = str(resp)
+
+        return jsonify({'answer': ai_answer}), 200
     except Exception as e:
         import traceback
-        error_details = traceback.format_exc()
-        print(f"聊天API错误: {str(e)}\n{error_details}")
-        return {'error': f'处理请求时出错: {str(e)}'}, 500
+        print("[API] /api/chat 异常：", e, traceback.format_exc())
+        return jsonify({'error': f'处理请求时出错: {str(e)}'}), 500
+
+
 
 
 @app.route("/api/generateQuestions", methods=["POST"])
