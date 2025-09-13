@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Head from '../Head';
-import { Layout, Input, Button, Space, message, Drawer } from 'antd';
+import { Layout, Input, Button, message } from 'antd';
 import { SendOutlined, MenuOutlined, PlusOutlined, MessageOutlined } from '@ant-design/icons';
+import ReactMarkdown from 'react-markdown';
 import './index.less';
 
 const { Content } = Layout;
@@ -9,6 +10,7 @@ const { Content } = Layout;
 const Home = () => {
   const [question, setQuestion] = useState('');
   const [chatHistory, setChatHistory] = useState(() => {
+    // 直接从localStorage恢复chatHistory
     const savedHistory = localStorage.getItem('chatHistory');
     return savedHistory ? JSON.parse(savedHistory) : [];
   });
@@ -35,16 +37,16 @@ const Home = () => {
   }, [chatSessions]);
 
   useEffect(() => {
+    localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+  }, [chatHistory]);
+
+  useEffect(() => {
     if (currentSessionId) {
       localStorage.setItem('currentSessionId', currentSessionId);
-      const session = chatSessions.find(s => s.id === currentSessionId);
-      if (session) {
-        setChatHistory(session.messages);
-      }
     } else {
       localStorage.removeItem('currentSessionId');
     }
-  }, [currentSessionId, chatSessions]);
+  }, [currentSessionId]);
 
   const adjustCenterBoxHeight = () => {
     if (centerBoxRef.current) {
@@ -310,13 +312,23 @@ const Home = () => {
       const newSession = {
         id: sessionId,
         title: question.substring(0, 30) + (question.length > 30 ? '...' : ''),
-        messages: [userMsg],
+        messages: [],  // 先创建空的消息数组，等消息添加到chatHistory后再更新
         createdAt: new Date().toISOString()
       };
       setChatSessions(prev => [newSession, ...prev]);
     }
     
-    setChatHistory((prev) => [...prev, userMsg]);
+    setChatHistory((prev) => {
+      const newHistory = [...prev, userMsg];
+      
+      setChatSessions(prevSessions => prevSessions.map(session => 
+        session.id === sessionId 
+          ? { ...session, messages: newHistory }
+          : session
+      ));
+      
+      return newHistory;
+    });
     setLoading(true);
     
     setTimeout(() => {
@@ -340,7 +352,7 @@ const Home = () => {
           const newHistory = [...prev, aiMsg];
           setTypingIndex(newHistory.length - 1);
           
-          // 立即更新当前会话的消息
+          // 更新当前会话的消息（此时currentSessionId应该已经存在）
           if (currentSessionId) {
             setChatSessions(prevSessions => prevSessions.map(session => 
               session.id === currentSessionId 
@@ -422,10 +434,23 @@ const Home = () => {
                     <div className="user-msg">{msg.content}</div>
                   ) : (
                     <div className="ai-msg">
-                      {typingIndex === index && typedContent ? 
-                        typedContent : 
-                        msg.content
-                      }
+                      <ReactMarkdown
+                        components={{
+                          h1: ({children}) => <h1 style={{marginTop: '20px', marginBottom: '10px'}}>{children}</h1>,
+                          h2: ({children}) => <h2 style={{marginTop: '18px', marginBottom: '8px'}}>{children}</h2>,
+                          h3: ({children}) => <h3 style={{marginTop: '16px', marginBottom: '6px'}}>{children}</h3>,
+                          p: ({children}) => <p style={{marginBottom: '8px', lineHeight: '1.6'}}>{children}</p>,
+                          ul: ({children}) => <ul style={{marginBottom: '10px', paddingLeft: '20px'}}>{children}</ul>,
+                          ol: ({children}) => <ol style={{marginBottom: '10px', paddingLeft: '20px'}}>{children}</ol>,
+                          li: ({children}) => <li style={{marginBottom: '4px'}}>{children}</li>,
+                          strong: ({children}) => <strong style={{fontWeight: '600', color: '#1f2937'}}>{children}</strong>
+                        }}
+                      >
+                        {typingIndex === index && typedContent ? 
+                          typedContent : 
+                          msg.content
+                        }
+                      </ReactMarkdown>
                     </div>
                   )}
                 </div>
