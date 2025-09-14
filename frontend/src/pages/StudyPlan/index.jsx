@@ -38,11 +38,12 @@ const StudyPlan = () => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        console.log('从localStorage加载:', parsed);
         return {
           timeRange: parsed.timeRange && parsed.timeRange.length === 2 ? [
             moment(parsed.timeRange[0], 'HH:mm'), 
             moment(parsed.timeRange[1], 'HH:mm')
-          ] : [moment('07:00', 'HH:mm'), moment('21:00', 'HH:mm')],
+          ] : undefined, // 如果没有保存的值，设为undefined而不是默认值
           subjects: parsed.subjects || []
         };
       } catch (error) {
@@ -50,7 +51,6 @@ const StudyPlan = () => {
       }
     }
     return {
-      timeRange: [moment('07:00', 'HH:mm'), moment('21:00', 'HH:mm')],
       subjects: []
     };
   });
@@ -64,15 +64,19 @@ const StudyPlan = () => {
   }, [planHistory]);
 
   useEffect(() => {
-    if (formValues && formValues.timeRange && formValues.timeRange.length === 2) {
+    if (formValues) {
       const saveData = {
-        timeRange: [
-          formValues.timeRange[0].format('HH:mm'),
-          formValues.timeRange[1].format('HH:mm')
-        ],
         subjects: formValues.subjects || []
       };
+      // 保存timeRange
+      if (formValues.timeRange && formValues.timeRange.length === 2) {
+        saveData.timeRange = [
+          formValues.timeRange[0].format('HH:mm'),
+          formValues.timeRange[1].format('HH:mm')
+        ];
+      }
       localStorage.setItem('studyPlanFormValues', JSON.stringify(saveData));
+      console.log('保存到localStorage:', saveData);
     }
   }, [formValues]);
 
@@ -89,9 +93,17 @@ const StudyPlan = () => {
 
     if (formValues.subjects && formValues.subjects.length > 0) {
       form.setFieldsValue({
-        timeRange: [moment('07:00', 'HH:mm'), moment('21:00', 'HH:mm')],
+        // timeRange: [moment('07:00', 'HH:mm'), moment('21:00', 'HH:mm')], // 移除初始值设置
         subjects: formValues.subjects
       });
+    }
+
+    // 恢复保存的timeRange值
+    if (formValues.timeRange && formValues.timeRange.length === 2) {
+      form.setFieldsValue({
+        timeRange: formValues.timeRange
+      });
+      console.log('恢复timeRange值:', formValues.timeRange.map(t => t.format('HH:mm')));
     }
   }, []);
 
@@ -464,13 +476,17 @@ const StudyPlan = () => {
             <Form
               form={form}
               initialValues={{
-                timeRange: [moment('07:00', 'HH:mm'), moment('21:00', 'HH:mm')],
                 subjects: formValues.subjects || []
               }}
-              onValuesChange={(_, allValues) => {
-                if (allValues.timeRange && allValues.timeRange.length === 2) {
-                  setFormValues(allValues);
-                }
+              onValuesChange={(changedValues, allValues) => {
+                console.log('Form onChange - changedValues:', changedValues);
+                console.log('Form onChange - allValues:', allValues);
+                
+                // 更新formValues状态
+                setFormValues(prev => ({
+                  ...prev,
+                  ...allValues
+                }));
               }}
             >
               <Form.Item
@@ -480,7 +496,7 @@ const StudyPlan = () => {
               >
                 <TimePicker.RangePicker
                   format="HH:mm"
-                  placeholder={['开始时间', '结束时间']}
+                  placeholder={['请选择开始时间', '请选择结束时间']}
                 />
               </Form.Item>
               

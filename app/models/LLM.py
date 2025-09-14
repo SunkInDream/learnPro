@@ -4,10 +4,10 @@ import json
 
 # ========= 配置 =========
 client = OpenAI(
-    api_key="3a17f5d4fca1c645a33f3c53d03ce6e38a186f50",
-    base_url="https://api-1fwdm4d312ich0n1.aistudio-app.com/v1"
+    api_key="your-openai-api-key-here",  # 替换为您的 OpenAI API 密钥
+    # base_url="https://api-1fwdm4d312ich0n1.aistudio-app.com/v1"  # 注释掉自定义端点
 )
-MODEL_NAME = "default"   # 按你给的示例
+MODEL_NAME = "gpt-3.5-turbo"   # 使用 OpenAI 标准模型
 
 # ========= 工具函数 =========
 def clean_question_text(text: str) -> str:

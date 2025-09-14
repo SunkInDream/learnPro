@@ -10,7 +10,6 @@ const { Content } = Layout;
 const Home = () => {
   const [question, setQuestion] = useState('');
   const [chatHistory, setChatHistory] = useState(() => {
-    // 直接从localStorage恢复chatHistory
     const savedHistory = localStorage.getItem('chatHistory');
     return savedHistory ? JSON.parse(savedHistory) : [];
   });
@@ -51,10 +50,8 @@ const Home = () => {
   const adjustCenterBoxHeight = () => {
     if (centerBoxRef.current) {
       if (chatHistory.length === 0) {
-        // 没有对话时，使用100vh让输入框居中
         centerBoxRef.current.style.minHeight = '100vh';
       } else if (chatContainerRef.current) {
-        // 有对话时，根据内容计算高度
         const chatHeight = chatContainerRef.current.scrollHeight;
         const inputWrapperHeight = 80; 
         const padding = 40; 
@@ -81,10 +78,8 @@ const Home = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // 页面卸载前保存数据
   useEffect(() => {
     const saveBeforeUnload = () => {
-      // 如果当前有对话内容，保存到会话中
       if (currentSessionId && chatHistory.length > 0) {
         const firstUserMessage = chatHistory.find(msg => msg.role === 'user');
         const sessionTitle = firstUserMessage?.content?.substring(0, 30) + '...' || '新对话';
@@ -107,20 +102,17 @@ const Home = () => {
 
 
   const createNewChat = () => {
-    // 如果当前有对话内容，必须保存为历史会话
     if (chatHistory.length > 0) {
       const firstUserMessage = chatHistory.find(msg => msg.role === 'user');
       const sessionTitle = firstUserMessage?.content?.substring(0, 30) + '...' || '新对话';
       
       if (currentSessionId) {
-        // 如果已经有会话ID，更新该会话
         setChatSessions(prev => prev.map(session => 
           session.id === currentSessionId 
             ? { ...session, title: sessionTitle, messages: [...chatHistory] }
             : session
         ));
       } else {
-        // 如果没有会话ID，创建新的历史记录
         const newSession = {
           id: Date.now().toString(),
           title: sessionTitle,
@@ -131,26 +123,22 @@ const Home = () => {
       }
     }
     
-    // 清空当前对话状态，开始新对话
     setChatHistory([]);
     setCurrentSessionId(null);
     setTypingIndex(null);
     setTypedContent('');
     
-    // 重置对话框滚动位置和状态
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = 0;
     }
     setShouldAutoScroll(true);
     setIsUserScrolling(false);
     
-    // 重新计算center-box高度
     setTimeout(adjustCenterBoxHeight, 100);
   };
 
 
   const switchToSession = (sessionId) => {
-    // 保存当前会话的更改
     if (currentSessionId && chatHistory.length > 0) {
       const firstUserMessage = chatHistory.find(msg => msg.role === 'user');
       const sessionTitle = firstUserMessage?.content?.substring(0, 30) + '...' || '新对话';
@@ -162,25 +150,22 @@ const Home = () => {
       ));
     }
     
-    // 切换到新会话
     const session = chatSessions.find(s => s.id === sessionId);
     if (session) {
       setChatHistory(session.messages);
       setCurrentSessionId(sessionId);
-      
-      // 重置状态
+
       setShouldAutoScroll(true);
       setIsUserScrolling(false);
       setTypingIndex(null);
       setTypedContent('');
       
-      // 重置滚动位置到底部
       setTimeout(() => {
         if (chatContainerRef.current && session.messages.length > 0) {
           const container = chatContainerRef.current;
           container.scrollTop = container.scrollHeight;
         }
-        // 重新计算center-box高度
+
         adjustCenterBoxHeight();
       }, 100);
     }
@@ -303,7 +288,7 @@ const Home = () => {
 
     const userMsg = { role: 'user', content: question };
     
-    // 如果是新对话（没有会话ID），创建新的会话
+
     let sessionId = currentSessionId;
     if (!sessionId) {
       sessionId = Date.now().toString();
@@ -312,7 +297,7 @@ const Home = () => {
       const newSession = {
         id: sessionId,
         title: question.substring(0, 30) + (question.length > 30 ? '...' : ''),
-        messages: [],  // 先创建空的消息数组，等消息添加到chatHistory后再更新
+        messages: [],  
         createdAt: new Date().toISOString()
       };
       setChatSessions(prev => [newSession, ...prev]);
@@ -352,7 +337,7 @@ const Home = () => {
           const newHistory = [...prev, aiMsg];
           setTypingIndex(newHistory.length - 1);
           
-          // 更新当前会话的消息（此时currentSessionId应该已经存在）
+
           if (currentSessionId) {
             setChatSessions(prevSessions => prevSessions.map(session => 
               session.id === currentSessionId 
@@ -458,12 +443,11 @@ const Home = () => {
             </div>
           )}
 
-          {/* 欢迎文本 - 只在没有对话时显示 */}
+
           {chatHistory.length === 0 && (
             <div className="welcome-text">随便问点什么</div>
           )}
 
-          {/* 统一的输入框 - 根据对话状态改变位置 */}
           <div className={`input-container ${chatHistory.length === 0 ? 'center-position' : 'bottom-position'}`}>
             <div className="input-box">
               <Input
