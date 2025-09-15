@@ -21,7 +21,6 @@ const PrivateRoute = ({ children }) => {
   return children;
 };
 
-// 公共路由守卫 - 已登录用户不能访问（如登录页、注册页）
 const PublicRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('isLoggedIn') === 'true';
   console.log('PublicRoute - 登录状态:', isAuthenticated);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Button, Card, Typography, Space, Row, Col } from 'antd';
+import { Layout, Button, Card, Typography, Space, Row, Col,Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import Head from '../Head';
 import { 
@@ -17,6 +17,8 @@ const { Title, Paragraph, Text } = Typography;
 
 export default function Main() {
   const navigate = useNavigate();
+  const [isshowpatent,setIsShowpatent] = React.useState(false);
+  const [isshowend,setIsShowend] = React.useState(false);
   return (
     <Layout className="main-layout">
       <Head/>
@@ -36,7 +38,7 @@ export default function Main() {
                 size="large" 
                 icon={<RocketOutlined />}
                 className="start-button"
-                onClick={() => navigate('/study-plan')}
+                onClick={() => navigate('/user')}
               >
                 开始学习
               </Button>
@@ -44,8 +46,9 @@ export default function Main() {
                 size="large" 
                 icon={<CalendarOutlined />}
                 className="plan-button"
+                onClick={() => navigate('/study-plan')}
               >
-                ???
+                计划
               </Button>
             </Space>
           </div>
@@ -61,10 +64,10 @@ export default function Main() {
                     <BookOutlined />
                   </div>
                 }
+                onClick={() => {setIsShowpatent(true)}}
               >
                 <Card.Meta
-                  title="?????"
-                  description="??????????????????????????????"
+                  title="专利"
                 />
               </Card>
             </Col>
@@ -77,11 +80,10 @@ export default function Main() {
                     <TrophyOutlined />
                   </div>
                 }
-                
+                onClick={() => setIsShowend(true)}
               >
                 <Card.Meta
-                  title="?????"
-                  description="???????????????????????????????????"
+                  title="结项"
                 />
               </Card>
             </Col>
@@ -94,10 +96,10 @@ export default function Main() {
                     <BulbOutlined />
                   </div>
                 }
+                onClick={() => navigate('/feedback')}
               >
                 <Card.Meta
-                  title="?????"
-                  description="???????????????????????????????????"
+                  title="关于我们"
                 />
               </Card>
             </Col>
@@ -121,24 +123,34 @@ export default function Main() {
               <Title level={4}>联系方式</Title>
               <Space direction="vertical">
                 <Text>
-                  <MailOutlined /> support@studyhelper.com
+                  <MailOutlined /> 123456@qq.com
                 </Text>
-                <Text>客服热线:????????</Text>
+                
               </Space>
             </Card>
           </Col>
           <Col xs={24} md={8}>
             <Card className="footer-card">
               <Title level={4}>版权信息</Title>
-              <Paragraph>
-                © ???????
-                <br />
-                ???????
-              </Paragraph>
+              
             </Card>
           </Col>
         </Row>
       </Footer>
+      <Modal
+      title="专利"
+      open = {isshowpatent}
+      onOk={() => setIsShowpatent(false)}
+      onCancel={() => setIsShowpatent(false)}>
+        <img style={{width:'100%'}} src="/image/patent.png"></img>
+      </Modal>
+      <Modal
+      title="结项"
+      open = {isshowend}
+      onOk={() => setIsShowend(false)}
+      onCancel={() => setIsShowend(false)}>
+        <img style={{width:'100%'}} src="/image/end.png"></img>
+      </Modal>
     </Layout>
   );
 }

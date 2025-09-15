@@ -43,7 +43,7 @@ const StudyPlan = () => {
           timeRange: parsed.timeRange && parsed.timeRange.length === 2 ? [
             moment(parsed.timeRange[0], 'HH:mm'), 
             moment(parsed.timeRange[1], 'HH:mm')
-          ] : undefined, // 如果没有保存的值，设为undefined而不是默认值
+          ] : undefined, 
           subjects: parsed.subjects || []
         };
       } catch (error) {
@@ -93,12 +93,11 @@ const StudyPlan = () => {
 
     if (formValues.subjects && formValues.subjects.length > 0) {
       form.setFieldsValue({
-        // timeRange: [moment('07:00', 'HH:mm'), moment('21:00', 'HH:mm')], // 移除初始值设置
         subjects: formValues.subjects
       });
     }
 
-    // 恢复保存的timeRange值
+
     if (formValues.timeRange && formValues.timeRange.length === 2) {
       form.setFieldsValue({
         timeRange: formValues.timeRange
